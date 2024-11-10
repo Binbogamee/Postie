@@ -1,0 +1,12 @@
+*.dll
+*.pdb
+*.exe
+bin
+obj
+.vs/
+Postie/data/kafka/
+*.user
+/LoggingService/.config/
+*.pubxml
+Postie.DAL/Migrations/
+/Postie/.config/
