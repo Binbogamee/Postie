@@ -3,6 +3,7 @@
     public enum KafkaTopic
     {
         Audit,
-        Errors
+        Errors,
+        Heartbeat
     }
 }

@@ -8,13 +8,15 @@ namespace LoggingService.InternalServices
 {
     public class BaseLoggerService : BackgroundService
     {
-        private readonly Logger _logger;
+        private readonly Logger _coreLogger;
+        private readonly Logger _heartbeatLogger;
         private readonly string _topic;
         public IConsumer<Ignore, string> Consumer {  get; }
 
         public BaseLoggerService(IConfiguration configuration, KafkaTopic topic)
         {
-            _logger = LogManager.GetCurrentClassLogger();
+            _coreLogger = LogManager.GetLogger("CoreLogger");
+            _heartbeatLogger = LogManager.GetLogger("HeartbeatLogger");
             _topic = topic.ToString();
 
             var consumerConfig = new ConsumerConfig
@@ -28,6 +30,8 @@ namespace LoggingService.InternalServices
 
             Consumer = new ConsumerBuilder<Ignore, string>(consumerConfig).Build();
             Consumer.Subscribe(_topic);
+
+            _heartbeatLogger.Info($"Consume \"{_topic}\" Kafka topic");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -46,12 +50,6 @@ namespace LoggingService.InternalServices
             Consumer.Close();
         }
 
-        public async Task Test()
-        {
-            Console.WriteLine("Audit service");
-            await Task.Delay(TimeSpan.FromSeconds(3));
-        }
-
         public void ProcessKafkaMessage(CancellationToken stoppingToken)
         {
             try
@@ -60,17 +58,28 @@ namespace LoggingService.InternalServices
 
                 var message = JsonConvert.DeserializeObject<LogDto>(consumeResult.Message.Value);
 
-                _logger.Log(message?.LogLevel, $"{message?.Message}");
+                if (message == null)
+                {
+                    return;
+                }
+
+                if (message.Area == LogArea.Core)
+                {
+                    _coreLogger.Log(message.LogLevel, $"{message.Message}");
+                }
+                else
+                {
+                    _heartbeatLogger.Log(message.LogLevel, $"{message.Message}");
+                }
             }
             catch (Exception ex)
             {
-                _logger.Error($"Error processing Kafka message: {ex.Message}");
+                _coreLogger.Error($"Error processing Kafka message: {ex.Message}");
             }
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
-            _logger.Info("Остановка Logging service...");
             await base.StopAsync(stoppingToken);
         }
     }

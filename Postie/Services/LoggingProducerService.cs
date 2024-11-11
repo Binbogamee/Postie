@@ -24,12 +24,12 @@ namespace Postie.Services
             _producer = new ProducerBuilder<Null, string>(producerconfig).Build();
         }
 
-        public async void SendLogMessage(NLog.LogLevel level, string message)
+        public async void SendLogMessage(NLog.LogLevel level, string message, LogArea area = LogArea.Core)
         {
             try
             {
                 var topic = string.Empty;
-                var request = CreateLogMessage(level, message, out topic);
+                var request = CreateLogMessage(area, level, message, out topic);
                 if (String.IsNullOrEmpty(topic))
                 {
                     return;
@@ -47,23 +47,32 @@ namespace Postie.Services
             }
         }
 
-        private LogDto CreateLogMessage(NLog.LogLevel level, string message, out string topic)
+        private LogDto CreateLogMessage(LogArea area, NLog.LogLevel level, string message, out string topic)
         {
             var request = new LogDto()
             {
+                Area = area,
                 LogLevel = level,
                 Message = message
             };
 
-            switch (level.Ordinal)
+            if (area == LogArea.Heartbeat)
             {
-                case 4:
-                case 5:
-                    topic = KafkaTopic.Errors.ToString();
-                    break;
-                default:
-                    topic = KafkaTopic.Audit.ToString();
-                    break;
+                topic = KafkaTopic.Heartbeat.ToString();
+            }
+            else
+            {
+                switch (level.Ordinal)
+                {
+                    case 4:
+                    case 5:
+                        topic = KafkaTopic.Errors.ToString();
+                        break;
+                    default:
+                    
+                        topic = KafkaTopic.Audit.ToString();
+                        break;
+                }
             }
 
             return request;

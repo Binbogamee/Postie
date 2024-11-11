@@ -63,6 +63,7 @@ services:
         echo "Start creating topics"
         kafka-topics --create --topic Audit --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
         kafka-topics --create --topic Errors --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
+        kafka-topics --create --topic Heartbeat --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
 
 volumes:
   postgres-data:

@@ -7,10 +7,7 @@ using Postie.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -25,6 +22,7 @@ builder.Services.AddDbContext<PostieDbContext>(
     });
 
 builder.Services.AddScoped<ILoggingProducerService, LoggingProducerService>();
+builder.Services.AddHostedService<LifetimeService>();
 var app = builder.Build();
 
 app.UseSwagger();
@@ -35,12 +33,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
-//app.UseCors(x =>
-//{
-//    x.WithHeaders().AllowAnyHeader();
-//    x.WithOrigins("http://localhost:3000");
-//    x.WithMethods().AllowAnyMethod();
-//});
 
 app.Run();

@@ -30,6 +30,7 @@ builder.Services.AddDbContext<PostieDbContext>(
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ILoggingProducerService, LoggingProducerService>();
 builder.Services.AddScoped<IPostService, PostService.InternalServices.PostService>();
+builder.Services.AddHostedService<LifetimeService>();
 
 var app = builder.Build();
 
@@ -41,12 +42,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
-//app.UseCors(x =>
-//{
-//    x.WithHeaders().AllowAnyHeader();
-//    //x.WithOrigins("http://localhost:3001");
-//    x.WithMethods().AllowAnyMethod();
-//});
 
 app.Run();
