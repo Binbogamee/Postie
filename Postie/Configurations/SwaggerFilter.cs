@@ -15,13 +15,11 @@ namespace Postie.Configurations
         }
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
-            // Находим пути, которые не соответствуют заданному префиксу, чтобы их убрать
             var pathsToRemove = swaggerDoc.Paths
                 .Where(path => !path.Key.StartsWith("/" + _prefix))
                 .Select(p => p.Key)
                 .ToList();
 
-            // Удаляем неподходящие пути
             foreach (var path in pathsToRemove)
             {
                 swaggerDoc.Paths.Remove(path);

@@ -12,5 +12,7 @@ namespace Postie.DAL
         }
 
         public DbSet<PostEntity> Posts { get; set; }
+
+        public DbSet<AccountEntity> Accounts { get; set; }
     }
 }

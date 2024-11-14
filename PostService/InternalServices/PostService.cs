@@ -1,5 +1,4 @@
-﻿using Postie.Dtos;
-using Postie.Interfaces;
+﻿using Postie.Interfaces;
 using Postie.Models;
 using LogLevel = NLog.LogLevel;
 
