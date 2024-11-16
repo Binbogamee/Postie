@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Postie.Configurations;
+using Microsoft.Extensions.Options;
+using Postie.Infrastructure;
 using Postie.Dtos;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Postie.Controllers
 {
@@ -11,19 +11,19 @@ namespace Postie.Controllers
     public class PostController : ControllerBase
     {
         private readonly HttpClient _httpClient;
-        public PostController()
+        private readonly string _postServiceRoute;
+        public PostController(IOptions<ServicesRoutes> routes)
         {
-            _httpClient = RequestClient.Instance.DefaultHttpClient;
+            _httpClient = HttpRequestHelper.Instance.DefaultHttpClient;
+            _postServiceRoute = routes.Value.PostServiceUrl;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<PostDto>>> Posts()
         {
-            var url = ServicesRouts.Routs[ServicesRouts.Services.Post];
-
             try
             {
-                var response = await _httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(_postServiceRoute);
 
                 if (response.StatusCode != System.Net.HttpStatusCode.OK)
                 {
@@ -41,7 +41,7 @@ namespace Postie.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<PostDto>> GetPost(Guid id)
         {
-            var url = String.Format("{0}/{1}", ServicesRouts.Routs[ServicesRouts.Services.Post], id);
+            var url = String.Format("{0}/{1}", _postServiceRoute, id);
 
             try
             {
@@ -63,15 +63,14 @@ namespace Postie.Controllers
         {
             try
             {
-                var url = ServicesRouts.Routs[ServicesRouts.Services.Post];
                 var content = new StringContent($"\"{text}\"", Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(url, content);
+                var response = await _httpClient.PostAsync(_postServiceRoute, content);
 
                 if (response.StatusCode != System.Net.HttpStatusCode.OK)
                 {
                     return BadRequest(response.Content.ReadAsStringAsync().Result);
                 }
-                return Created(url, response.Content.ReadAsStringAsync().Result);
+                return Created(_postServiceRoute, response.Content.ReadAsStringAsync().Result);
             }
             catch (Exception ex)
             {
@@ -84,7 +83,7 @@ namespace Postie.Controllers
         {
             try
             {
-                var url = String.Format("{0}/{1}", ServicesRouts.Routs[ServicesRouts.Services.Post], id);
+                var url = String.Format("{0}/{1}", _postServiceRoute, id);
                 var content = new StringContent($"\"{text}\"", Encoding.UTF8, "application/json");
                 var response = await _httpClient.PutAsync(url, content);
 
@@ -105,7 +104,7 @@ namespace Postie.Controllers
         {
             try
             {
-                var url = String.Format("{0}/{1}", ServicesRouts.Routs[ServicesRouts.Services.Post], id);
+                var url = String.Format("{0}/{1}", _postServiceRoute, id);
                 var response = await _httpClient.DeleteAsync(url);
 
                 if (response.StatusCode != System.Net.HttpStatusCode.OK)

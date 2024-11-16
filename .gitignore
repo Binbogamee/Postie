@@ -10,3 +10,7 @@ Postie/data/kafka/
 *.pubxml
 Postie.DAL/Migrations/
 /Postie/.config/
+/AccountService/config.env
+/AccountService/auth.yml
+/AccountService/auth.json
+/Postie/appConfig.json

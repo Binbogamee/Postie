@@ -57,6 +57,13 @@ namespace AccountService.Repositories
             }
         }
 
+        public Account Get(string email)
+        {
+            var entity = _context.Accounts.Where(x => x.Email == email).FirstOrDefault();
+
+            return entity == null ? new Account() : AccountMapper(entity);
+        }
+
         public ICollection<Account> List()
         {
             try

@@ -7,7 +7,7 @@ try
 
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
-    builder.Configuration.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: true, reloadOnChange: true);
+    builder.Configuration.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true);
     builder.Services.AddHostedService<LoggingService.InternalServices.ErrorLoggerService>();
     builder.Services.AddHostedService<LoggingService.InternalServices.AuditLoggerService>();
     builder.Services.AddHostedService<LoggingService.InternalServices.HeartbeatLoggerService>();

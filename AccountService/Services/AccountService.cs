@@ -10,13 +10,16 @@ namespace AccountService.Services
         private const int Max_Username_Length = 50;
         private const int Max_Email_Length = 255;
         private const int Min_Password_Length = 8;
-        private IAccountRepository _accountRepository;
-        private ILoggingProducerService _loggingService;
+
+        private readonly IAccountRepository _accountRepository;
+        private readonly ILoggingProducerService _loggingService;
+        private readonly AccountManager _accountManager;
 
         public AccountService(IAccountRepository accountRepository, ILoggingProducerService loggingService)
         {
             _accountRepository = accountRepository;
             _loggingService = loggingService;
+            _accountManager = AccountManager.Instance;
         }
         public Guid Create(string username, string email, string password)
         {
@@ -36,7 +39,7 @@ namespace AccountService.Services
                 return Guid.Empty;
             }
 
-            var passwordhash = HashPassword(password);
+            var passwordhash = _accountManager.HashPassword(password);
             var account = new Account(username, email, passwordhash);
 
             if (_accountRepository.Create(account))
@@ -83,18 +86,14 @@ namespace AccountService.Services
         public bool ChangePassword(Guid id, string oldPassword, string newPassword)
         {
             var oldAccount = Get(id);
-            if (!BCrypt.Net.BCrypt.Verify(oldPassword, oldAccount.PasswordHash))
-            {
-                throw new Exception("Old password is wrong");
-            }
-
+            _accountManager.VerifyPassword(oldPassword, oldAccount.PasswordHash);
             var validated = ValidatePassword(newPassword);
             if (validated != string.Empty)
             {
                 throw new Exception(validated);
             }
 
-            var passwordHash = HashPassword(newPassword);
+            var passwordHash = _accountManager.HashPassword(newPassword);
             var account = new Account(oldAccount.Username, oldAccount.Email, passwordHash, id);
             return _accountRepository.Update(account);
         }
@@ -111,15 +110,20 @@ namespace AccountService.Services
                 throw new Exception("The username must be less than 50 characters.");
             }
 
-            var accounts = List().Select(x => x.Username);
-            if (accounts.Contains(username))
+            var accounts = List();
+            if (accounts.Select(x => x.Username).Contains(username))
             {
-                throw new Exception("This username is already taken");
+                throw new Exception("This username is already taken.");
             }
 
             if (email.Length > Max_Email_Length)
             {
                 throw new Exception("The email must be less than 255 characters.");
+            }
+
+            if (accounts.Select(x => x.Email).Contains(username))
+            {
+                throw new Exception("An account has already been registered to this email.");
             }
 
             if (email.EndsWith("."))
@@ -156,11 +160,6 @@ namespace AccountService.Services
             }
 
             return string.Empty;
-        }
-
-        private string HashPassword(string password)
-        {
-            return BCrypt.Net.BCrypt.HashPassword(password);
         }
     }
 }

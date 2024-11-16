@@ -1,11 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Postie.Configurations;
 using Postie.DAL;
+using Postie.Infrastructure;
 using Postie.Interfaces;
 using Postie.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true);
+
+builder.Services.Configure<ServicesRoutes>(builder.Configuration.GetSection(nameof(ServicesRoutes)));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

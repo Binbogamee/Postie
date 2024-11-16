@@ -25,4 +25,10 @@
         string OldPassword,
         string NewPassword
     );
+
+    public record LoginRequest
+    (
+        string Email,
+        string Password
+    );
 }
