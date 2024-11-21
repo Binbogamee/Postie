@@ -5,16 +5,14 @@ using Postie.Interfaces;
 namespace AccountService.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        private readonly IAuthService _authService;
 
-        public AccountController(IAccountService accountService, IAuthService authenticationService)
+        public AccountController(IAccountService accountService)
         {
             _accountService = accountService;
-            _authService = authenticationService;
         }
 
         [HttpPost]
@@ -87,14 +85,6 @@ namespace AccountService.Controllers
             }
 
             return BadRequest(result);
-        }
-
-        [HttpPost("Login")]
-        public ActionResult<string> Login([FromBody] LoginRequest request)
-        {
-            var result = _authService.Login(request.Email, request.Password);
-
-            return Ok(result);
         }
     }
 }

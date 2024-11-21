@@ -14,3 +14,7 @@ Postie.DAL/Migrations/
 /AccountService/auth.yml
 /AccountService/auth.json
 /Postie/appConfig.json
+/ApiGateway/auth.json
+/AuthService/auth.json
+/Postie/auth.json
+/AuthHelper/auth.json

@@ -9,6 +9,5 @@ namespace Postie.Interfaces
         bool Update(Account account);
         bool Create(Account account);
         bool Delete(Guid id);
-        Account Get(string email);
     }
 }

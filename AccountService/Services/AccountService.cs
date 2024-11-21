@@ -1,4 +1,5 @@
-﻿using Postie.Interfaces;
+﻿using Postie.Infrastructure;
+using Postie.Interfaces;
 using Postie.Models;
 using System.Text;
 using LogLevel = NLog.LogLevel;
@@ -13,13 +14,13 @@ namespace AccountService.Services
 
         private readonly IAccountRepository _accountRepository;
         private readonly ILoggingProducerService _loggingService;
-        private readonly AccountManager _accountManager;
+        private readonly PasswordHashHelper _accountManager;
 
         public AccountService(IAccountRepository accountRepository, ILoggingProducerService loggingService)
         {
             _accountRepository = accountRepository;
             _loggingService = loggingService;
-            _accountManager = AccountManager.Instance;
+            _accountManager = PasswordHashHelper.Instance;
         }
         public Guid Create(string username, string email, string password)
         {

@@ -1,0 +1,103 @@
+{
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5207",
+    "Hosts": {
+      "PostService": "https://localhost:44360",
+      "AccountService": "https://localhost:44305",
+      "AuthService": "https://localhost:44304"
+    }
+  },
+  "Routes": [
+    // post service
+    {
+      "UpstreamPathTemplate": "/api/Post",
+      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{PostService}"
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Post",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/Post/{id}",
+      "UpstreamHttpMethod": [ "Get", "Put", "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{PostService}"
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Post/{id}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    // account service
+    {
+      "UpstreamPathTemplate": "/api/Account",
+      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{AccountService}"
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Account",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/Account/{id}",
+      "UpstreamHttpMethod": [ "Get", "Put", "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{AccountService}"
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Account/{id}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/Account/{id}/Password",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{AccountService}"
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Account/{id}/Password",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    // auth service
+    {
+      "UpstreamPathTemplate": "/api/Login",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{AuthService}"
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Login"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Logout",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 0
+        }
+      ],
+      "RouteIsCaseSensitive": false,
+      "DelegatingHandlers": [ "LogoutHandler" ]
+    }
+  ]
+}

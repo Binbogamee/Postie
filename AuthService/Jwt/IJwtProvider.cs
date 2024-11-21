@@ -1,6 +1,6 @@
 ﻿using Postie.Models;
 
-namespace AccountService.Jwt
+namespace AuthService.Jwt
 {
     public interface IJwtProvider
     {

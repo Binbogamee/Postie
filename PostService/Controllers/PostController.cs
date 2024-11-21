@@ -5,7 +5,7 @@ using Postie.Dtos;
 namespace PostService.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;

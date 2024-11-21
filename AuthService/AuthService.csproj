@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AuthHelper\AuthHelper.csproj" />
     <ProjectReference Include="..\Postie.DAL\Postie.DAL.csproj" />
     <ProjectReference Include="..\Postie\Postie.csproj" />
   </ItemGroup>

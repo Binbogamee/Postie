@@ -1,10 +1,10 @@
-﻿namespace AccountService
+﻿namespace Postie.Infrastructure
 {
-    public class AccountManager
+    public class PasswordHashHelper
     {
-        private static readonly Lazy<AccountManager> _instance = new Lazy<AccountManager>(() => new AccountManager());
+        private static readonly Lazy<PasswordHashHelper> _instance = new Lazy<PasswordHashHelper>(() => new PasswordHashHelper());
 
-        public static AccountManager Instance => _instance.Value;
+        public static PasswordHashHelper Instance => _instance.Value;
 
         public string HashPassword(string password)
         {
