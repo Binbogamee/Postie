@@ -6,8 +6,8 @@ namespace Postie.Interfaces
     {
         ICollection<Post> List();
         Post Get(Guid id);
-        bool Update(Post post);
-        bool Create(Post post);
+        void Update(Post post);
+        void Create(Post post);
         bool Delete(Guid id);
     }
 }

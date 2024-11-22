@@ -19,7 +19,10 @@ namespace AuthService.Services
         public string Login(string email, string password)
         {
             var user = _authRepository.Get(email);
-            _passwordHasher.VerifyPassword(password, user.PasswordHash);
+            if (!_passwordHasher.VerifyPassword(password, user.PasswordHash))
+            {
+                return string.Empty;
+            }
 
             var token = _jwtProvider.GenerateToken(user);
 

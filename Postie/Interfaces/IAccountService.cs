@@ -6,9 +6,9 @@ namespace Postie.Interfaces
     {
         List<Account> List();
         Account Get(Guid id);
-        Guid Create(string username, string email, string password);
+        (Guid id, string error) Create(string username, string email, string password);
         bool Delete(Guid id);
-        Guid Update(Guid id, string username, string email);
-        bool ChangePassword(Guid id, string oldPassword, string newPassword);
+        (Guid id, string error) Update(Guid id, string username, string email);
+        string ChangePassword(Guid id, string oldPassword, string newPassword);
     }
 }

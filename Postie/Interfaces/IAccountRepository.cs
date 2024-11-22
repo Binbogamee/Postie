@@ -6,8 +6,8 @@ namespace Postie.Interfaces
     {
         ICollection<Account> List();
         Account Get(Guid id);
-        bool Update(Account account);
-        bool Create(Account account);
+        void Update(Account account);
+        void Create(Account account);
         bool Delete(Guid id);
     }
 }

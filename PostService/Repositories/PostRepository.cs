@@ -14,81 +14,42 @@ namespace PostService.Repositories
             _context = context;
         }
 
-        public bool Create(Post post)
+        public void Create(Post post)
         {
-            try
-            {
-                _context.Add(PostMapper(post));
-                _context.SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            _context.Add(PostMapper(post));
+            _context.SaveChanges();
         }
 
         public bool Delete(Guid id)
         {
-            try
-            {
-                var deleted = _context.Posts.Where(x => x.Id == id).ExecuteDelete();
-                _context.SaveChanges();
-                return deleted != 0;
-            }
-            catch
-            {
-                return false;
-            }
+            var deleted = _context.Posts.Where(x => x.Id == id).ExecuteDelete();
+            _context.SaveChanges();
+            return deleted != 0;
         }
 
         public Post Get(Guid id)
         {
-            try
-            {
-                var entity = _context.Posts.AsNoTracking().FirstOrDefault(x => x.Id == id);
+            var entity = _context.Posts.AsNoTracking().FirstOrDefault(x => x.Id == id);
 
-                if (entity == null)
-                {
-                    return new Post();
-                }
-                return PostMapper(entity);
-            }
-            catch
+            if (entity == null)
             {
                 return new Post();
             }
 
+            return PostMapper(entity);
         }
 
         public ICollection<Post> List()
         {
-            try
-            {
-                var entities = _context.Posts.AsNoTracking().ToList();
-                return entities.Select(x => PostMapper(x)).ToList();
-            }
-            catch
-            {
-                return new List<Post>();
-            }
+            var entities = _context.Posts.AsNoTracking().ToList();
+            return entities.Select(x => PostMapper(x)).ToList();
         }
 
-        public bool Update(Post post)
+        public void Update(Post post)
         {
-            try
-            {
-                var entity = PostMapper(post);
-                _context.Posts.Update(entity);
-                _context.SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-
-            
+            var entity = PostMapper(post);
+            _context.Posts.Update(entity);
+            _context.SaveChanges();            
         }
 
         private Post PostMapper(PostEntity entity)

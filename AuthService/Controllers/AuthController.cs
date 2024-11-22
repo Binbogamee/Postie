@@ -19,6 +19,10 @@ namespace AuthService.Controllers
         public ActionResult<string> Login([FromBody] LoginRequest request)
         {
             var result = _authService.Login(request.Email, request.Password);
+            if (string.IsNullOrEmpty(result))
+            {
+                return BadRequest();
+            }
 
             return Ok(result);
         }

@@ -41,21 +41,31 @@ namespace PostService.Controllers
         public ActionResult<Guid> CreatePost([FromBody] string text)
         {
             var result = _postService.Create(text);
-            return result != Guid.Empty ? Ok(result) : BadRequest(result);
+            if (result.id == Guid.Empty)
+            {
+                return UnprocessableEntity(result.error);
+            }
+
+            return Ok(result.id);
         }
 
         [HttpPut("{id:guid}")]
         public ActionResult<Guid> UpdatePost(Guid id, [FromBody] string text)
         {
             var result = _postService.Update(id, text);
-            return result != Guid.Empty ? Ok(result) : BadRequest(result);
+            if (result.id == Guid.Empty)
+            {
+                return UnprocessableEntity(result.error);
+            }
+
+            return Ok(result.id);
         }
 
         [HttpDelete("{id:guid}")]
         public ActionResult<bool> DeletePost(Guid id)
         {
             var result = _postService.Delete(id);
-            return result ? Ok(result) : BadRequest(result);
+            return result ? Ok() : NotFound();
         }
     }
 }

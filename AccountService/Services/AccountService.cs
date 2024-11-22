@@ -2,7 +2,7 @@
 using Postie.Interfaces;
 using Postie.Models;
 using System.Text;
-using LogLevel = NLog.LogLevel;
+using Messages = Postie.Messages;
 
 namespace AccountService.Services
 {
@@ -22,7 +22,7 @@ namespace AccountService.Services
             _loggingService = loggingService;
             _accountManager = PasswordHashHelper.Instance;
         }
-        public Guid Create(string username, string email, string password)
+        public (Guid id, string error) Create(string username, string email, string password)
         {
             username = username.Trim();
             email = email.Trim();
@@ -36,21 +36,14 @@ namespace AccountService.Services
                 sb.Append(validated);
                 sb.Append(passwordCheck);
 
-                //_loggingService.SendLogMessage(LogLevel.Error, sb.ToString());
-                return Guid.Empty;
+                return (Guid.Empty, sb.ToString());
             }
 
             var passwordhash = _accountManager.HashPassword(password);
             var account = new Account(username, email, passwordhash);
 
-            if (_accountRepository.Create(account))
-            {
-                //_loggingService.SendLogMessage(LogLevel.Info, $"Account {account.Id} created.");
-                return account.Id;
-            }
-
-            //_loggingService.SendLogMessage(LogLevel.Error, $"Failed to create account");
-            return Guid.Empty;
+            _accountRepository.Create(account);
+            return (account.Id, string.Empty);
         }
 
         public bool Delete(Guid id)
@@ -68,68 +61,81 @@ namespace AccountService.Services
             return _accountRepository.List().ToList();
         }
 
-        public Guid Update(Guid id, string username, string email)
+        public (Guid id, string error) Update(Guid id, string username, string email)
         {
             username = username.Trim();
             email = email.Trim();
             var validated = ValidateUserData(username, email);
             if (validated != string.Empty)
             {
-                return Guid.Empty;
+                return (Guid.Empty, validated);
             }
 
             var oldAccount = Get(id);
+            if (oldAccount.Id == Guid.Empty)
+            {
+                return (Guid.Empty, Messages.AccountNotFound);
+            }
             var account = new Account(username, email, oldAccount.PasswordHash, id);
-
-            return _accountRepository.Update(account) ? account.Id : Guid.Empty;
+            _accountRepository.Update(account);
+            return (account.Id, string.Empty);
         }
 
-        public bool ChangePassword(Guid id, string oldPassword, string newPassword)
+        public string ChangePassword(Guid id, string oldPassword, string newPassword)
         {
             var oldAccount = Get(id);
-            _accountManager.VerifyPassword(oldPassword, oldAccount.PasswordHash);
+            if (oldAccount.Id != Guid.Empty)
+            {
+                return Messages.AccountNotFound;
+            }
+
+            if (!_accountManager.VerifyPassword(oldPassword, oldAccount.PasswordHash))
+            {
+                return Messages.WrongEmailOrPassword;
+            }
             var validated = ValidatePassword(newPassword);
             if (validated != string.Empty)
             {
-                throw new Exception(validated);
+                return validated;
             }
 
             var passwordHash = _accountManager.HashPassword(newPassword);
             var account = new Account(oldAccount.Username, oldAccount.Email, passwordHash, id);
-            return _accountRepository.Update(account);
+            _accountRepository.Update(account);
+            return string.Empty;
         }
 
         private string ValidateUserData(string username, string email)
         {
             if (username == string.Empty || email == string.Empty)
             {
-                throw new Exception("Please fill in all fields.");
+                return Messages.FillFields;
             }
 
             if (username.Length > Max_Username_Length)
             {
-                throw new Exception("The username must be less than 50 characters.");
+                return Messages.UsernameIsTooLong;
             }
 
             var accounts = List();
             if (accounts.Select(x => x.Username).Contains(username))
             {
-                throw new Exception("This username is already taken.");
+                return Messages.UsernameIsTaken_;
             }
 
             if (email.Length > Max_Email_Length)
             {
-                throw new Exception("The email must be less than 255 characters.");
+                return Messages.EmailIsTooLong;
             }
 
             if (accounts.Select(x => x.Email).Contains(username))
             {
-                throw new Exception("An account has already been registered to this email.");
+                return Messages.EmailIsTaken;
             }
 
             if (email.EndsWith("."))
             {
-                throw new Exception("Invalid email.");
+                return Messages.InvalidEmail;
             }
 
             try
@@ -142,7 +148,7 @@ namespace AccountService.Services
             }
             catch
             {
-                throw new Exception("Invalid email.");
+                return Messages.InvalidEmail;
             }
 
             return string.Empty;
@@ -152,12 +158,12 @@ namespace AccountService.Services
         {
             if (password.Length < Min_Password_Length)
             {
-                throw new Exception("Password must contain more than 8 characters.");
+                return Messages.PasswordIsTooShort;
             }
 
             if (!password.Any(char.IsDigit) || !password.Any(char.IsUpper))
             {
-                throw new Exception("The password must contain at least one number and a capital letter.");
+                return Messages.PasswordValidationError;
             }
 
             return string.Empty;

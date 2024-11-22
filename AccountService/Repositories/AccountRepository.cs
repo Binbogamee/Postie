@@ -16,73 +16,36 @@ namespace AccountService.Repositories
             _context = context;
         }
 
-        public bool Create(Account account)
+        public void Create(Account account)
         {
-            try
-            {
-                _context.Add(AccountMapper(account));
-                _context.SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            _context.Add(AccountMapper(account));
+            _context.SaveChanges();
         }
 
         public bool Delete(Guid id)
         {
-            try
-            {
-                var deleted = _context.Accounts.Where(x => x.Id == id).ExecuteDelete();
-                _context.SaveChanges();
-                return deleted != 0;
-            }
-            catch
-            {
-                return false;
-            }
+            var deleted = _context.Accounts.Where(x => x.Id == id).ExecuteDelete();
+            _context.SaveChanges();
+            return deleted != 0;
         }
 
         public Account Get(Guid id)
         {
-            try
-            {
-                var account = _context.Accounts.AsNoTracking().FirstOrDefault(x => x.Id == id);
-                return account == null ? new Account() : AccountMapper(account);
-            }
-            catch
-            {
-                return new Account();
-            }
+            var account = _context.Accounts.AsNoTracking().FirstOrDefault(x => x.Id == id);
+            return account == null ? new Account() : AccountMapper(account);
         }
 
         public ICollection<Account> List()
         {
-            try
-            {
-                var entities = _context.Accounts.AsNoTracking().ToList();
-                return entities.Select(x => AccountMapper(x)).ToList();
-            }
-            catch
-            {
-                return new List<Account>();
-            }
+            var entities = _context.Accounts.AsNoTracking().ToList();
+            return entities.Select(x => AccountMapper(x)).ToList();
         }
 
-        public bool Update(Account account)
+        public void Update(Account account)
         {
-            try
-            {
-                var entity = AccountMapper(account);
-                _context.Accounts.Update(entity);
-                _context.SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            var entity = AccountMapper(account);
+            _context.Accounts.Update(entity);
+            _context.SaveChanges();
         }
 
         private Account AccountMapper(AccountEntity entity)

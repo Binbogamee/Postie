@@ -20,12 +20,12 @@ namespace AccountService.Controllers
         {
             var result = _accountService.Create(request.Username, request.Email, request.Password);
 
-            if (result == Guid.Empty)
+            if (result.id != Guid.Empty)
             {
-                return BadRequest();
+                return Ok(result.id);
             }
 
-            return Ok(result);
+            return UnprocessableEntity(result.error);
         }
 
         [HttpDelete("{id:guid}")]
@@ -35,7 +35,7 @@ namespace AccountService.Controllers
 
             if (!result)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             return Ok(result);
@@ -48,7 +48,7 @@ namespace AccountService.Controllers
 
             if (result.Id == Guid.Empty)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             return Ok(new AccountResponse(result.Id, result.Username, result.Email));
@@ -66,12 +66,12 @@ namespace AccountService.Controllers
         {
             var result = _accountService.Update(id, request.Username, request.Email);
 
-            if (result == Guid.Empty)
+            if (result.id == Guid.Empty)
             {
-                return BadRequest();
+                return UnprocessableEntity(result.error);
             }
 
-            return Ok(result);
+            return Ok(result.id);
         }
 
         [HttpPut("{id:guid}/Password")]
@@ -79,7 +79,7 @@ namespace AccountService.Controllers
         {
             var result = _accountService.ChangePassword(id, request.OldPassword, request.NewPassword);
 
-            if (result)
+            if (!string.IsNullOrEmpty(result))
             {
                 return Ok();
             }

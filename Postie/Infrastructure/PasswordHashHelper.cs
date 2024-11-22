@@ -11,12 +11,14 @@
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
-        public void VerifyPassword(string password, string passwordHash)
+        public bool VerifyPassword(string password, string passwordHash)
         {
             if (!BCrypt.Net.BCrypt.Verify(password, passwordHash))
             {
-                throw new Exception("Wrong email or password");
+                return false;
             }
+
+            return true;
         }
     }
 }

@@ -6,8 +6,8 @@ namespace Postie.Interfaces
     {
         ICollection<Post> List();
         Post Get(Guid id);
-        Guid Update(Guid id, string text);
-        Guid Create(string text);
+        (Guid id, string error) Update(Guid id, string text);
+        (Guid id, string error) Create(string text);
         bool Delete(Guid id);
     }
 }
