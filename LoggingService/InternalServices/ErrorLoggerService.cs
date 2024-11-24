@@ -1,4 +1,4 @@
-﻿using Postie.Models;
+﻿using Shared.KafkaLogging;
 
 namespace LoggingService.InternalServices
 {

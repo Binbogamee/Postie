@@ -4,7 +4,7 @@ using AuthService.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Postie.DAL;
 using Postie.Interfaces;
-using Postie.Services;
+using Shared.KafkaLogging;
 
 var builder = WebApplication.CreateBuilder(args);
 

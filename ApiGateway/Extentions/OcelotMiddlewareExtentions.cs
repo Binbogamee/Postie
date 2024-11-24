@@ -31,8 +31,7 @@ namespace ApiGateway.Extentions
                     }
                 }
             };
-
-            await app.UseOcelot(configuration);
+            await app.UseMiddleware<RequestResponseMiddleware>().UseOcelot(configuration);
         }
     }
 }

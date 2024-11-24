@@ -1,5 +1,6 @@
 ﻿using Postie.Interfaces;
 using Postie.Models;
+using Shared.KafkaLogging;
 using Messages = Postie.Messages;
 
 namespace PostService.InternalServices
@@ -7,12 +8,10 @@ namespace PostService.InternalServices
     public class PostService : IPostService
     {
         private readonly IPostRepository _postRepository;
-        private readonly ILoggingProducerService _logProduceService;
         private const int MAX_LENGTH = 200;
-        public PostService(IPostRepository postRepository, ILoggingProducerService logProduceService) 
+        public PostService(IPostRepository postRepository) 
         {
             _postRepository = postRepository;
-            _logProduceService = logProduceService;
 
         }
         public (Guid id, string error) Create(string text)

@@ -1,6 +1,7 @@
 ﻿using Postie.Infrastructure;
 using Postie.Interfaces;
 using Postie.Models;
+using Shared.KafkaLogging;
 using System.Text;
 using Messages = Postie.Messages;
 
@@ -13,13 +14,11 @@ namespace AccountService.Services
         private const int Min_Password_Length = 8;
 
         private readonly IAccountRepository _accountRepository;
-        private readonly ILoggingProducerService _loggingService;
         private readonly PasswordHashHelper _accountManager;
 
-        public AccountService(IAccountRepository accountRepository, ILoggingProducerService loggingService)
+        public AccountService(IAccountRepository accountRepository)
         {
             _accountRepository = accountRepository;
-            _loggingService = loggingService;
             _accountManager = PasswordHashHelper.Instance;
         }
         public (Guid id, string error) Create(string username, string email, string password)

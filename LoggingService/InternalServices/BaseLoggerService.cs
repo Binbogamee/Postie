@@ -1,8 +1,7 @@
 ﻿using Confluent.Kafka;
 using Newtonsoft.Json;
 using NLog;
-using Postie.Dtos;
-using Postie.Models;
+using Shared.KafkaLogging;
 
 namespace LoggingService.InternalServices
 {

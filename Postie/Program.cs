@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Postie.DAL;
-using Postie.Interfaces;
-using Postie.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +11,6 @@ builder.Services.AddDbContext<PostieDbContext>(
         options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(PostieDbContext)));
     });
 
-builder.Services.AddScoped<ILoggingProducerService, LoggingProducerService>();
-builder.Services.AddHostedService<LifetimeService>();
 var app = builder.Build();
 
 app.UseHttpsRedirection();

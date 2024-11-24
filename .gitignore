@@ -18,3 +18,4 @@ Postie.DAL/Migrations/
 /AuthService/auth.json
 /Postie/auth.json
 /AuthHelper/auth.json
+/Shared/appConfig.json

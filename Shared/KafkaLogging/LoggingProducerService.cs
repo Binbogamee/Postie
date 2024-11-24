@@ -1,10 +1,8 @@
 ﻿using Confluent.Kafka;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Postie.Dtos;
-using Postie.Interfaces;
-using Postie.Models;
 
-namespace Postie.Services
+namespace Shared.KafkaLogging
 {
     public class LoggingProducerService : ILoggingProducerService
     {
@@ -30,7 +28,7 @@ namespace Postie.Services
             {
                 var topic = string.Empty;
                 var request = CreateLogMessage(area, level, message, out topic);
-                if (String.IsNullOrEmpty(topic))
+                if (string.IsNullOrEmpty(topic))
                 {
                     return;
                 }
@@ -69,13 +67,13 @@ namespace Postie.Services
                         topic = KafkaTopic.Errors.ToString();
                         break;
                     default:
-                    
+
                         topic = KafkaTopic.Audit.ToString();
                         break;
                 }
             }
 
             return request;
-        } 
+        }
     }
 }

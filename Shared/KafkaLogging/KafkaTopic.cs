@@ -1,4 +1,4 @@
-﻿namespace Postie.Models
+﻿namespace Shared.KafkaLogging
 {
     public enum KafkaTopic
     {

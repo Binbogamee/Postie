@@ -1,13 +1,14 @@
-﻿using NLog;
-using Postie.Interfaces;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using NLog;
 using System.Reflection;
 
-namespace Postie.Services
+namespace Shared.KafkaLogging
 {
     public class LifetimeService : BackgroundService
     {
         private readonly Logger _logger;
-        private readonly string _projectName; 
+        private readonly string _projectName;
         private readonly IHostApplicationLifetime _appLifetime;
         private readonly ILoggingProducerService _loggingProducerService;
         private readonly IServiceProvider _serviceProvider;
@@ -32,11 +33,13 @@ namespace Postie.Services
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 _appLifetime.ApplicationStarted.Register(OnStarted);
             });
 
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 _appLifetime.ApplicationStopped.Register(OnStopped);
             });
 
@@ -45,12 +48,12 @@ namespace Postie.Services
 
         private void OnStarted()
         {
-            _loggingProducerService.SendLogMessage(NLog.LogLevel.Info, $"{_projectName} started", Dtos.LogArea.Heartbeat);
+            _loggingProducerService.SendLogMessage(NLog.LogLevel.Info, $"{_projectName} started", LogArea.Heartbeat);
         }
 
         private void OnStopped()
         {
-            _loggingProducerService.SendLogMessage(NLog.LogLevel.Info, $"{_projectName} stopped", Dtos.LogArea.Heartbeat);
+            _loggingProducerService.SendLogMessage(NLog.LogLevel.Info, $"{_projectName} stopped", LogArea.Heartbeat);
         }
     }
 }

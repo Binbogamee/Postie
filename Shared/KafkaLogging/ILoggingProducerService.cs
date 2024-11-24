@@ -1,6 +1,4 @@
-﻿using Postie.Dtos;
-
-namespace Postie.Interfaces
+﻿namespace Shared.KafkaLogging
 {
     public interface ILoggingProducerService
     {

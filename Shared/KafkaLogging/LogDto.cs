@@ -1,11 +1,11 @@
 ﻿using NLog;
 
-namespace Postie.Dtos
+namespace Shared.KafkaLogging
 {
     public class LogDto
     {
         public LogArea Area { get; set; }
-        public NLog.LogLevel LogLevel { get; set; }
+        public LogLevel LogLevel { get; set; }
         public string Message { get; set; }
     }
 

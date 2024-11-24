@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuthHelper\AuthHelper.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>
