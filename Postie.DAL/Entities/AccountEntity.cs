@@ -10,5 +10,7 @@ namespace Postie.DAL.Entities
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
+
+        public ICollection<PostEntity> Posts { get; set; } = new List<PostEntity>();
     }
 }

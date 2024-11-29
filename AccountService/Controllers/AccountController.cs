@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Postie.Dtos;
+using Postie.Infrastructure;
 using Postie.Interfaces;
 
 namespace AccountService.Controllers
@@ -20,25 +21,25 @@ namespace AccountService.Controllers
         {
             var result = _accountService.Create(request.Username, request.Email, request.Password);
 
-            if (result.id != Guid.Empty)
+            if (result.IsSuccess)
             {
-                return Ok(result.id);
+                return Ok(result.Value);
             }
 
-            return UnprocessableEntity(result.error);
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpDelete("{id:guid}")]
-        public ActionResult<bool> Delete(Guid id)
+        public ActionResult<bool> Delete(Guid id, [FromBody] RequesterDto request)
         {
-            var result = _accountService.Delete(id);
+            var result = _accountService.Delete(request.RequesterId, id);
 
-            if (!result)
+            if (result.IsSuccess)
             {
-                return NotFound();
+                return Ok(result.Value);
             }
 
-            return Ok(result);
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpGet("{id:guid}")]
@@ -46,45 +47,51 @@ namespace AccountService.Controllers
         {
             var result = _accountService.Get(id);
 
-            if (result.Id == Guid.Empty)
+            if (result.IsSuccess)
             {
-                return NotFound();
+                var account = result.Value;
+                return Ok(new AccountResponse(account.Id, account.Username, account.Email));
             }
 
-            return Ok(new AccountResponse(result.Id, result.Username, result.Email));
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpGet]
         public ActionResult<List<AccountResponse>> List()
         {
             var result = _accountService.List();
-            return Ok(result.Select(x => new AccountResponse(x.Id, x.Username, x.Email)).ToList());
+            if (result.IsSuccess)
+            {
+                return Ok(result.Value.Select(x => new AccountResponse(x.Id, x.Username, x.Email)).ToList());
+            }
+
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpPut("{id:guid}")]
         public ActionResult<Guid> Update(Guid id, [FromBody] AccountRequest request)
         {
-            var result = _accountService.Update(id, request.Username, request.Email);
+            var result = _accountService.Update(request.RequesterId, id, request.Username, request.Email);
 
-            if (result.id == Guid.Empty)
+            if (result.IsSuccess)
             {
-                return UnprocessableEntity(result.error);
+                return Ok(result.Value);
             }
 
-            return Ok(result.id);
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpPut("{id:guid}/Password")]
         public ActionResult<bool> ChangePassword(Guid id, [FromBody] PasswordChangeRequest request)
         {
-            var result = _accountService.ChangePassword(id, request.OldPassword, request.NewPassword);
+            var result = _accountService.ChangePassword(request.RequesterId, id, request.OldPassword, request.NewPassword);
 
-            if (!string.IsNullOrEmpty(result))
+            if (result.IsSuccess)
             {
-                return Ok();
+                return Ok(result.Value);
             }
 
-            return BadRequest(result);
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
     }
 }

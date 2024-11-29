@@ -1,6 +1,5 @@
 ﻿using Postie.Interfaces;
 using Postie.Models;
-using Shared.KafkaLogging;
 using Messages = Postie.Messages;
 
 namespace PostService.InternalServices
@@ -14,53 +13,73 @@ namespace PostService.InternalServices
             _postRepository = postRepository;
 
         }
-        public (Guid id, string error) Create(string text)
+        public Result<Guid> Create(Guid accountId, string text)
         {
             var validation = Validate(text);
-
             if (!string.IsNullOrEmpty(validation))
             {
-                return (Guid.Empty, validation);
+                return Result<Guid>.Failure(ErrorType.ValidationError, validation);
             }
 
-            var post = new Post(text);
+            var post = new Post(text, accountId);
             _postRepository.Create(post);
-            return (post.Id, string.Empty);
+            return Result<Guid>.Success(post.Id);
         }
 
-        public bool Delete(Guid id)
+        public Result<bool> Delete(Guid id, Guid requesterId)
         {
-            return _postRepository.Delete(id);
-        }
-
-        public Post Get(Guid id)
-        {
-            return _postRepository.Get(id);
-        }
-
-        public ICollection<Post> List()
-        {
-            return _postRepository.List();
-        }
-
-        public (Guid id, string error) Update(Guid id, string text)
-        {
-            var validation = Validate(text);
-
-            if (validation != string.Empty)
+            if (!IsAuthorize(requesterId, id, out _))
             {
-                return (Guid.Empty, validation);
+                return Result<bool>.Failure(ErrorType.AccessDenied);
             }
 
-            var oldPost = Get(id);
+            if (_postRepository.Delete(id))
+            {
+                return Result<bool>.Success(true);
+            }
+
+            return Result<bool>.Failure(ErrorType.NotFound);
+        }
+
+        public Result<Post> Get(Guid id)
+        {
+            return Result<Post>.Success(_postRepository.Get(id));
+        }
+
+        public Result<ICollection<Post>> List()
+        {
+            return Result<ICollection<Post>>.Success(_postRepository.List());
+        }
+
+        public Result<ICollection<Post>> ListByAccountId(Guid accountId)
+        {
+            return Result<ICollection<Post>>.Success(_postRepository.ListByAccountId(accountId));
+        }
+
+        public Result<Guid> Update(Guid id, string text, Guid requesterId)
+        {
+            Post oldPost;
+
+            if (!IsAuthorize(requesterId, id, out oldPost))
+            {
+                return Result<Guid>.Failure(ErrorType.AccessDenied);
+            }
+
             if (oldPost.Id == Guid.Empty)
             {
-                return (Guid.Empty, Messages.PostNotFound);
+                return Result<Guid>.Failure(ErrorType.NotFound);
             }
 
-            var post = new Post(text, id, oldPost.CreatedBy, DateTime.UtcNow);
+            var validation = Validate(text);
+            if (validation != string.Empty)
+            {
+                return Result<Guid>.Failure(ErrorType.ValidationError, validation);
+            }
+
+
+            var post = new Post(text, oldPost.AccountId, id, oldPost.CreatedBy, DateTime.UtcNow);
             _postRepository.Update(post);
-            return (post.Id, string.Empty);
+            return Result<Guid>.Success(post.Id);
         }
 
         private string Validate(string text)
@@ -76,6 +95,17 @@ namespace PostService.InternalServices
             }
 
             return string.Empty;
+        }
+
+        private bool IsAuthorize(Guid requesterId, Guid postId, out Post post)
+        {
+            post = _postRepository.Get(postId);
+            if (post.Id == Guid.Empty)
+            {
+                return false;
+            }
+
+            return post.AccountId == requesterId;
         }
     }
 }

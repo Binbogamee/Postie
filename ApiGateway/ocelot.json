@@ -38,7 +38,7 @@
     // account service
     {
       "UpstreamPathTemplate": "/api/Account",
-      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "UpstreamHttpMethod": [ "Get"],
       "DownstreamHostAndPorts": [
         {
           "Host": "{AccountService}"
@@ -48,6 +48,16 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
       }
+    },
+    {
+      "UpstreamPathTemplate": "/api/Account",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "{AccountService}"
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Account"
     },
     {
       "UpstreamPathTemplate": "/api/Account/{id}",

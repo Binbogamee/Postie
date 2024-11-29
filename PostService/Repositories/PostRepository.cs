@@ -45,6 +45,12 @@ namespace PostService.Repositories
             return entities.Select(x => PostMapper(x)).ToList();
         }
 
+        public ICollection<Post> ListByAccountId(Guid accountId)
+        {
+            var entities = _context.Posts.Where(x => x.AccountId == accountId).AsNoTracking().ToList();
+            return entities.Select(x => PostMapper(x)).ToList();
+        }
+
         public void Update(Post post)
         {
             var entity = PostMapper(post);
@@ -54,7 +60,7 @@ namespace PostService.Repositories
 
         private Post PostMapper(PostEntity entity)
         {
-            return new Post(entity.Text, entity.Id, entity.CreatedBy, entity.ModifiedBy);
+            return new Post(entity.Text, entity.AccountId, entity.Id, entity.CreatedBy, entity.ModifiedBy);
         }
 
         private PostEntity PostMapper(Post post)
@@ -62,6 +68,7 @@ namespace PostService.Repositories
             return new PostEntity()
             {
                 Id = post.Id,
+                AccountId = post.AccountId,
                 Text = post.Text,
                 CreatedBy = post.CreatedBy,
                 ModifiedBy = post.ModifiedBy

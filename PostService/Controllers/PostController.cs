@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Postie.Interfaces;
 using Postie.Dtos;
+using Postie.Infrastructure;
 
 namespace PostService.Controllers
 {
@@ -16,56 +17,69 @@ namespace PostService.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<PostDto>> Posts()
+        public ActionResult<List<CreatedPostDto>> Posts([FromQuery] Guid? accountId)
         {
+            if (accountId.HasValue)
+            {
+                var filteredPosts = _postService.ListByAccountId(accountId.Value);
+                var filteredResult = filteredPosts.Value.Select(x => new CreatedPostDto(x.Id, x.AccountId, x.Text, x.CreatedBy.ToLocalTime(), x.ModifiedBy?.ToLocalTime()));
+                return Ok(filteredResult);
+            }
+            
             var posts = _postService.List();
-            var result = posts.Select(x => new PostDto(x.Id, x.Text, x.CreatedBy.ToLocalTime(), x.ModifiedBy?.ToLocalTime()));
-
+            var result = posts.Value.Select(x => new CreatedPostDto(x.Id, x.AccountId, x.Text, x.CreatedBy.ToLocalTime(), x.ModifiedBy?.ToLocalTime()));
             return Ok(result);
         }
 
         [HttpGet("{id:guid}")]
-        public ActionResult<PostDto> GetPost(Guid id)
+        public ActionResult<CreatedPostDto> GetPost(Guid id)
         {
-            var post = _postService.Get(id);
-            if (post.Id == Guid.Empty)
+            var result = _postService.Get(id);
+
+            if (result.IsSuccess)
             {
-                return NotFound();
+                var post = result.Value;
+                var response = new CreatedPostDto(post.Id, post.AccountId, post.Text, post.CreatedBy.ToLocalTime(), post.ModifiedBy?.ToLocalTime());
+                return Ok(result.Value);
             }
 
-            var response = new PostDto(post.Id, post.Text, post.CreatedBy.ToLocalTime(), post.ModifiedBy?.ToLocalTime());
-            return Ok(response);
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpPost]
-        public ActionResult<Guid> CreatePost([FromBody] string text)
+        public ActionResult<Guid> CreatePost([FromBody] RequestPostDto post)
         {
-            var result = _postService.Create(text);
-            if (result.id == Guid.Empty)
+            var result = _postService.Create(post.RequesterId, post.Text);
+            if (result.IsSuccess)
             {
-                return UnprocessableEntity(result.error);
+                return Ok(result.Value);
             }
 
-            return Ok(result.id);
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpPut("{id:guid}")]
-        public ActionResult<Guid> UpdatePost(Guid id, [FromBody] string text)
+        public ActionResult<Guid> UpdatePost(Guid id, [FromBody] RequestPostDto post)
         {
-            var result = _postService.Update(id, text);
-            if (result.id == Guid.Empty)
+            var result = _postService.Update(id, post.Text, post.RequesterId);
+            if (result.IsSuccess)
             {
-                return UnprocessableEntity(result.error);
+                return Ok(result.Value);
             }
 
-            return Ok(result.id);
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpDelete("{id:guid}")]
-        public ActionResult<bool> DeletePost(Guid id)
+        public ActionResult<bool> DeletePost(Guid id, [FromBody] RequesterDto request)
         {
-            var result = _postService.Delete(id);
-            return result ? Ok() : NotFound();
-        }
+            var result = _postService.Delete(id, request.RequesterId);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Value);
+            }
+
+            return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
+        }        
     }
 }

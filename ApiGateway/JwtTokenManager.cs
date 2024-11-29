@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Primitives;
 using System.Collections.Concurrent;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace ApiGateway
@@ -69,6 +70,15 @@ namespace ApiGateway
             }
 
             return null;
+        }
+
+        public Claim? GetJwtClaimAccountId(string authstring)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(authstring);
+            var tokenS = jsonToken as JwtSecurityToken;
+            return tokenS.Claims.First(claim => claim.Type == "requesterId");
+
         }
 
         private void JwtCleanStart()

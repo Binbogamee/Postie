@@ -13,12 +13,6 @@ namespace ApiGateway.Extentions
             {
                 PreAuthenticationMiddleware = async (context, next) =>
                 {
-                    if (context.Request.Path == "/api/Login")
-                    {
-                        await next.Invoke();
-                        return;
-                    }
-
                     var authstring = jwtManager.GetRequestToken(context.Request.Headers.Authorization);
                     if (jwtManager.IsValidToken(authstring))
                     {
@@ -31,6 +25,7 @@ namespace ApiGateway.Extentions
                     }
                 }
             };
+
             await app.UseMiddleware<RequestResponseMiddleware>().UseOcelot(configuration);
         }
     }

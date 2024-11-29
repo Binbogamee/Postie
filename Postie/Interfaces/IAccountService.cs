@@ -4,11 +4,11 @@ namespace Postie.Interfaces
 {
     public interface IAccountService
     {
-        List<Account> List();
-        Account Get(Guid id);
-        (Guid id, string error) Create(string username, string email, string password);
-        bool Delete(Guid id);
-        (Guid id, string error) Update(Guid id, string username, string email);
-        string ChangePassword(Guid id, string oldPassword, string newPassword);
+        Result<ICollection<Account>> List();
+        Result<Account> Get(Guid id);
+        Result<Guid> Create(string username, string email, string password);
+        Result<bool> Delete(Guid requesterId,Guid id);
+        Result<Guid> Update(Guid requesterId,Guid id, string username, string email);
+        Result<string> ChangePassword(Guid requesterId,Guid id, string oldPassword, string newPassword);
     }
 }

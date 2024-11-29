@@ -4,13 +4,12 @@
     {
         public Post()
         {
-            Id = Guid.Empty;
-            CreatedBy = DateTime.MinValue;
         }
 
-        public Post(string text, Guid? id = null, DateTime? createdby = null, DateTime? modifiedby = null)
+        public Post(string text, Guid accountId, Guid? id = null, DateTime? createdby = null, DateTime? modifiedby = null)
         {
             Text = text;
+            AccountId = accountId;
 
             if (id == null)
             {
@@ -28,10 +27,11 @@
             }
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.Empty;
         public string Text { get; set; } = string.Empty;
         public DateTime CreatedBy { get; set; } = DateTime.MinValue;
         public DateTime? ModifiedBy { get; set; } = null;
+        public Guid AccountId { get; set; } = Guid.Empty;
 
     }
 

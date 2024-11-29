@@ -18,7 +18,7 @@ namespace AuthService.Jwt
         public string GenerateToken(Account account)
         {
             Claim[] claims = [
-                new("accountId", account.Id.ToString())
+                new("requesterId", account.Id.ToString())
             ];
 
             var signingCredantials = new SigningCredentials(

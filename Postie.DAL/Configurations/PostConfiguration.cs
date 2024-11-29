@@ -18,6 +18,11 @@ namespace Postie.DAL.Configurations
                 .IsRequired();
 
             builder.Property(x => x.ModifiedBy);
+
+            builder.HasOne(a => a.Account)
+                .WithMany(p => p.Posts)
+                .HasForeignKey(a => a.AccountId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
