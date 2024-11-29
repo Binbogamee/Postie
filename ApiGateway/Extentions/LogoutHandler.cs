@@ -6,29 +6,30 @@ namespace ApiGateway.Extentions
     public class LogoutHandler : DelegatingHandler
     {
         private readonly JwtTokenManager _jwtTokenManager = JwtTokenManager.Instance;
+        private readonly JwtCacheService _jwtCacheService;
+
+        public LogoutHandler(JwtCacheService jwtCacheService)
+        {
+            _jwtCacheService = jwtCacheService;
+        }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var authstring = request.Headers.Authorization?.Parameter;
-
             if (String.IsNullOrEmpty(authstring))
             {
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
             }
 
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(authstring);
-            var tokenS = jsonToken as JwtSecurityToken;
-            var exp = tokenS.Claims.First(claim => claim.Type == "exp");
-
-            var expDate = _jwtTokenManager.GetJwtExp(exp);
-
+            var expDate = _jwtTokenManager.GetJwtExp(authstring);
             if (expDate == null)
             {
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
             }
 
-            _jwtTokenManager.AddInvalidToken(authstring, (DateTime)expDate);
+            var expiration = (DateTime)expDate;
+            await _jwtCacheService.AddInvalidTokenAsync(authstring, expiration.ToString(), (expiration - DateTime.UtcNow));
+
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
     }

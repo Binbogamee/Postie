@@ -18,6 +18,17 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    container_name: redis
+    restart: no
+    image: redis:alpine
+    command: ["redis-server","/etc/redis/redis.conf"]
+    volumes:
+      - /redis/redis-data:/var/lib/redis
+      - /redis/redis.conf:/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     hostname: zookeeper
