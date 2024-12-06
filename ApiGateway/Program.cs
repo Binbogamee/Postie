@@ -17,6 +17,8 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(J
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     ConnectionMultiplexer.Connect(builder.Configuration.GetSection("Redis:ConnectionString").Value));
 
+ExternalConfigSettings.Initialize(builder.Configuration);
+
 builder.Services.ConfigureRoutesPlaceholders(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddScoped<ILoggingProducerService, LoggingProducerService>();

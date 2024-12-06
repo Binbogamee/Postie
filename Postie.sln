@@ -23,7 +23,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthService", "AuthService\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthHelper", "AuthHelper\AuthHelper.csproj", "{3B407208-18CC-43F1-B1BB-FBFE208B3FE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{D1EF7EDC-040B-4896-814C-AECAF7F6BB64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{D1EF7EDC-040B-4896-814C-AECAF7F6BB64}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EC0E517F-0E86-47EE-924C-D5AC81F06C62}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.env = .env
+		AccountService.Dockerfile = AccountService.Dockerfile
+		ApiGateway.Dockerfile = ApiGateway.Dockerfile
+		AuthService.Dockerfile = AuthService.Dockerfile
+		docker-compose.yml = docker-compose.yml
+		LoggingService.Dockerfile = LoggingService.Dockerfile
+		Migration.Dockerfile = Migration.Dockerfile
+		PostService.Dockerfile = PostService.Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

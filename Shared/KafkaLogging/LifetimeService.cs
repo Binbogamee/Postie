@@ -49,6 +49,7 @@ namespace Shared.KafkaLogging
         private void OnStarted()
         {
             _loggingProducerService.SendLogMessage(NLog.LogLevel.Info, $"{_projectName} started", LogArea.Heartbeat);
+            _loggingProducerService.SendLogMessage(NLog.LogLevel.Info, _projectName + ExternalConfigSettings.Instance.GetConfigString(), LogArea.Heartbeat);
         }
 
         private void OnStopped()

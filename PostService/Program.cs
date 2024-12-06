@@ -6,12 +6,11 @@ using Shared.KafkaLogging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Configuration.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true);
+builder.Configuration
+    .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true)
+    .AddEnvironmentVariables();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -20,6 +19,8 @@ builder.Services.AddDbContext<PostieDbContext>(
     {
         options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(PostieDbContext)));
     });
+
+ExternalConfigSettings.Initialize(builder.Configuration);
 
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ILoggingProducerService, LoggingProducerService>();

@@ -6,8 +6,11 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Logging.ClearProviders();
+    builder.Configuration
+        .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true)
+        .AddEnvironmentVariables();
     builder.Host.UseNLog();
-    builder.Configuration.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true);
+
     builder.Services.AddHostedService<LoggingService.InternalServices.ErrorLoggerService>();
     builder.Services.AddHostedService<LoggingService.InternalServices.AuditLoggerService>();
     builder.Services.AddHostedService<LoggingService.InternalServices.HeartbeatLoggerService>();

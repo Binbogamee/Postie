@@ -3,7 +3,9 @@ using Postie.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true);
+builder.Configuration
+    .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true)
+    .AddEnvironmentVariables();
 
 builder.Services.AddDbContext<PostieDbContext>(
     options =>

@@ -8,9 +8,17 @@ namespace LoggingService.InternalServices
         protected readonly Logger _logger;
         protected readonly string _projectName;
         private readonly IHostApplicationLifetime _appLifetime;
+        private readonly string _ipAddress = string.Empty;
+        private readonly string _kafkaServiceAddress = string.Empty;
+        private readonly string _logConfigTemplate = "{0} configuration settings:\n" +
+            "IP address: {1};\n" +
+            "Kafka service: {2}.";
 
-        public LifetimeLoggerService(IHostApplicationLifetime appLifetime)
+        public LifetimeLoggerService(IHostApplicationLifetime appLifetime, IConfiguration configuration)
         {
+            _ipAddress = configuration["ASPNETCORE_URLS"] ?? string.Empty;
+            _kafkaServiceAddress = configuration["Kafka:BootstrapServers"] ?? string.Empty;
+
             _projectName = Assembly.GetEntryAssembly().GetName().Name ?? string.Empty;
             _logger = LogManager.GetLogger("HeartbeatLogger");
             _appLifetime = appLifetime;
@@ -37,6 +45,7 @@ namespace LoggingService.InternalServices
         private void OnStarted()
         {
             _logger.Info($"{_projectName} started");
+            _logger.Info(String.Format(_logConfigTemplate, _projectName, _ipAddress, _kafkaServiceAddress));
         }
 
         private void OnStopped()

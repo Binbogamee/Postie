@@ -1,0 +1,10 @@
+*/obj
+*/bin
+.vs
+.git
+.github
+*/Migrations
+*/data
+
+*.user
+*.log

@@ -1,0 +1,160 @@
+services:
+  # apigateway:
+  #   build:
+  #     context: .
+  #     dockerfile: ./ApiGateway.Dockerfile
+  #   environment:
+  #     Redis__ConnectionString: "redis:${REDIS_PORT}"
+  #     JwtOptions__ExpiratesMinutes: "${JWT_EXPMIN}"
+  #     JwtOptions__Key: "${JWT_SECRETKEY}"
+  #     Kafka__BootstrapServers: "kafka:${KAFKA_PORT}"
+  #     GlobalConfiguration__Hosts__PostService: "http://post-service:${POST_SERVICE_PORT}"
+  #     GlobalConfiguration__Hosts__AccountService: "http://account-service:${ACCOUNT_SERVICE_PORT}"
+  #     GlobalConfiguration__Hosts__AuthService: "http://auth-service:${AUTH_SERVICE_PORT}"
+  #     ASPNETCORE_URLS: "http://0.0.0.0:${APIGATEWAY_PORT}"
+  #   ports:
+  #     - "${APIGATEWAY_PORT}:${APIGATEWAY_PORT}"
+  
+  # account-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./AccountService.Dockerfile
+  #   environment:
+  #     Kafka__BootstrapServers: "kafka:${KAFKA_PORT}"
+  #     ConnectionStrings__PostieDbContext: "User ID=${DB_USER};Password=${DB_PASSWORD};Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};"
+  #     ASPNETCORE_URLS: "http://0.0.0.0:${ACCOUNT_SERVICE_PORT}"
+  #   ports:
+  #     - "${ACCOUNT_SERVICE_PORT}:${ACCOUNT_SERVICE_PORT}"
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./AuthService.Dockerfile
+    environment:
+      Kafka__BootstrapServers: "kafka:${KAFKA_PORT}"
+      ConnectionStrings__PostieDbContext: "User ID=${DB_USER};Password=${DB_PASSWORD};Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};"
+      JwtOptions__ExpiratesMinutes: "${JWT_EXPMIN}"
+      JwtOptions__Key: "${JWT_SECRETKEY}"
+      ASPNETCORE_URLS: "http://0.0.0.0:${AUTH_SERVICE_PORT}"
+    ports:
+      - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
+
+#   logging-service:
+#     build:
+#       context: .
+#       dockerfile: ./LoggingService.Dockerfile
+#     environment:
+#       Kafka__BootstrapServers: "kafka:${KAFKA_PORT}"
+#       Log_Path: "&{LOG_PATH}"
+#       ASPNETCORE_URLS: "http://0.0.0.0:${LOGGING_SERVICE_PORT}"
+#     ports:
+#       - "${LOGGING_SERVICE_PORT}:${LOGGING_SERVICE_PORT}"
+
+#   post-service:
+#     build:
+#       context: .
+#       dockerfile: ./PostService.Dockerfile
+#     environment:
+#       Kafka__BootstrapServers: "kafka:${KAFKA_PORT}"
+#       ConnectionStrings__PostieDbContext: "User ID=${DB_USER};Password=${DB_PASSWORD};Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};"
+#       ASPNETCORE_URLS: "http://0.0.0.0:${POST_SERVICE_PORT}"
+#     ports:
+#       - "${POST_SERVICE_PORT}:${POST_SERVICE_PORT}"
+
+#   adminer:
+#     image: adminer
+#     restart: no
+#     ports:
+#       - 8080:8080
+
+#   db-migration:
+#     build:
+#       context: .
+#       dockerfile: ./Migration.Dockerfile
+#       args:
+#         CONNECTION_STRING: "User ID=${DB_USER};Password=${DB_PASSWORD};Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};"
+#     depends_on:
+#        postgres:
+#          condition: service_started
+#     entrypoint: 
+#       - /bin/sh
+#       - -c
+#       - |
+#         dotnet ef database update -s /src/Postie -p /src/Postie.DAL
+#         tail, -f, /dev/null
+  
+#   postgres:
+#     container_name: "${DB_HOST}"
+#     restart: no
+#     image: postgres:latest
+#     environment:
+#       POSTGRES_DB: "${DB_NAME}"
+#       POSTGRES_USER: "${DB_USER}"
+#       POSTGRES_PASSWORD: "${DB_PASSWORD}"
+#     volumes:
+#       - postgres-data:/var/lib/postgresql/data
+#     ports:
+#       - "${DB_PORT}:${DB_PORT}"
+
+  
+#   redis:
+#     container_name: redis
+#     restart: no
+#     image: redis:alpine
+#     command: ["redis-server","/etc/redis/redis.conf"]
+#     volumes:
+#       - /redis/redis-data:/var/lib/redis
+#       - /redis/redis.conf:/etc/redis/redis.conf
+#     ports:
+#       - "${REDIS_PORT}:${REDIS_PORT}"
+
+#   zookeeper:
+#     image: confluentinc/cp-zookeeper:latest
+#     hostname: zookeeper
+#     container_name: zookeeper
+#     ports:
+#       - "2181:2181"
+#     environment:
+#       ZOOKEEPER_CLIENT_PORT: 2181
+#       ZOOKEEPER_TICK_TIME: 2000
+
+#   kafka:
+#     image: confluentinc/cp-kafka:latest
+#     hostname: kafka
+#     container_name: kafka
+#     ports:
+#       - "${KAFKA_PORT}:${KAFKA_PORT}"
+#     environment:
+#       KAFKA_BROKER_ID: 1
+#       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:2${KAFKA_PORT},PLAINTEXT_HOST://localhost:${KAFKA_PORT}
+#       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+#       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+#       KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+#       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+#     depends_on:
+#       - zookeeper
+    
+#   kafka-init:
+#     image: confluentinc/cp-kafka:latest
+#     depends_on:
+#       - kafka
+#     entrypoint: 
+#       - /bin/sh
+#       - -c
+#       - |
+#         while ! nc -z kafka 2${KAFKA_PORT};
+#         do
+#           echo "Waiting Kafka..."
+#           sleep 1
+#         done
+#         echo "Start creating topics"
+#         kafka-topics --create --topic Audit --bootstrap-server kafka:2${KAFKA_PORT} --partitions 1 --replication-factor 1
+#         kafka-topics --create --topic Errors --bootstrap-server kafka:2${KAFKA_PORT} --partitions 1 --replication-factor 1
+#         kafka-topics --create --topic Heartbeat --bootstrap-server kafka:2${KAFKA_PORT} --partitions 1 --replication-factor 1
+
+# volumes:
+#   postgres-data:
+  

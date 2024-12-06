@@ -25,6 +25,8 @@ builder.Services.AddDbContext<PostieDbContext>(
         options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(PostieDbContext)));
     });
 
+ExternalConfigSettings.Initialize(builder.Configuration);
+
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<ILoggingProducerService, LoggingProducerService>();

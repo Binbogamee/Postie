@@ -7,7 +7,8 @@ using Shared.KafkaLogging;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
-    .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true);
+    .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appConfig.json"), true, true)
+    .AddEnvironmentVariables();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -18,6 +19,8 @@ builder.Services.AddDbContext<PostieDbContext>(
     {
         options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(PostieDbContext)));
     });
+
+ExternalConfigSettings.Initialize(builder.Configuration);
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ILoggingProducerService, LoggingProducerService>();
