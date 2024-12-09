@@ -1,8 +1,8 @@
 {
   "ConnectionStrings": {
-    "PostieDbContext": "User ID=postgres;Password=1234;Host=postgres;Port=5432;Database=postiedb;"
+    "PostieDbContext": "User ID=postgres;Password=1234;Host=localhost;Port=5432;Database=postiedb;"
   },
   "Kafka": {
-    "BootstrapServers": "localhost:9092"
+    "BootstrapServers": "localhost:29092"
   }
 }

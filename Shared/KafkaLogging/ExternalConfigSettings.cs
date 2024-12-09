@@ -43,7 +43,9 @@ namespace Shared.KafkaLogging
             RedisPath = configuration["Redis:ConnectionString"] ?? string.Empty;
 
             var jwtexp = configuration["JwtOptions:ExpiratesMinutes"] ?? string.Empty;
-            Int32.TryParse(jwtexp, out int JwtExpiresMin);
+            var min = 0;
+            Int32.TryParse(jwtexp, out min);
+            JwtExpiresMin = min;
 
             JwtKeyExisted = !String.IsNullOrEmpty(configuration["JwtOptions:ExpiratesMinutes"]);
         }
