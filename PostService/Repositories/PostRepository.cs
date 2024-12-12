@@ -18,6 +18,7 @@ namespace PostService.Repositories
         {
             _context.Add(PostMapper(post));
             _context.SaveChanges();
+            _context.ChangeTracker.Clear();
         }
 
         public bool Delete(Guid id)

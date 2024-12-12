@@ -20,6 +20,7 @@ namespace AccountService.Repositories
         {
             _context.Add(AccountMapper(account));
             _context.SaveChanges();
+            _context.ChangeTracker.Clear();
         }
 
         public bool Delete(Guid id)
@@ -44,6 +45,7 @@ namespace AccountService.Repositories
         public void Update(Account account)
         {
             var entity = AccountMapper(account);
+            
             _context.Accounts.Update(entity);
             _context.SaveChanges();
         }

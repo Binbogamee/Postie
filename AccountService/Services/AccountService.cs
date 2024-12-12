@@ -46,7 +46,7 @@ namespace AccountService.Services
 
         public Result<bool> Delete(Guid requesterId, Guid id)
         {
-            if (!IsAutorized(requesterId, id))
+            if (!IsAuthorized(requesterId, id))
             {
                 return Result<bool>.Failure(ErrorType.AccessDenied);
             }
@@ -66,14 +66,14 @@ namespace AccountService.Services
 
         public Result<Guid> Update(Guid requesterId, Guid id, string username, string email)
         {
-            if (!IsAutorized(requesterId, id))
+            if (!IsAuthorized(requesterId, id))
             {
                 return Result<Guid>.Failure(ErrorType.AccessDenied);
             }
 
             username = username.Trim();
             email = email.Trim();
-            var validated = ValidateUserData(username, email);
+            var validated = ValidateUserData(username, email, false);
             if (validated != string.Empty)
             {
                 return Result<Guid>.Failure(ErrorType.ValidationError, validated);
@@ -91,13 +91,13 @@ namespace AccountService.Services
 
         public Result<string> ChangePassword(Guid requesterId, Guid id, string oldPassword, string newPassword)
         {
-            if (!IsAutorized(requesterId, id))
+            if (!IsAuthorized(requesterId, id))
             {
                 return Result<string>.Failure(ErrorType.AccessDenied);
             }
 
             var oldAccount = _accountRepository.Get(id);
-            if (oldAccount.Id != Guid.Empty)
+            if (oldAccount.Id == Guid.Empty)
             {
                 return Result<string>.Failure(ErrorType.NotFound, Messages.AccountNotFound);
             }
@@ -118,7 +118,7 @@ namespace AccountService.Services
             return Result<string>.Success(string.Empty);
         }
 
-        private string ValidateUserData(string username, string email)
+        private string ValidateUserData(string username, string email, bool IsNew = true)
         {
             if (username == string.Empty || email == string.Empty)
             {
@@ -130,20 +130,23 @@ namespace AccountService.Services
                 return Messages.UsernameIsTooLong;
             }
 
-            var accounts = _accountRepository.List();
-            if (accounts.Select(x => x.Username).Contains(username))
+            if (IsNew)
             {
-                return Messages.UsernameIsTaken_;
+                var accounts = _accountRepository.List();
+                if (accounts.Select(x => x.Username).Contains(username))
+                {
+                    return Messages.UsernameIsTaken_;
+                }
+
+                if (accounts.Select(x => x.Email).Contains(username))
+                {
+                    return Messages.EmailIsTaken;
+                }
             }
 
             if (email.Length > Max_Email_Length)
             {
                 return Messages.EmailIsTooLong;
-            }
-
-            if (accounts.Select(x => x.Email).Contains(username))
-            {
-                return Messages.EmailIsTaken;
             }
 
             if (email.EndsWith("."))
@@ -182,7 +185,7 @@ namespace AccountService.Services
             return string.Empty;
         }
 
-        private bool IsAutorized(Guid requesterId, Guid targerId)
+        private bool IsAuthorized(Guid requesterId, Guid targerId)
         {
             return requesterId == targerId;
         }
