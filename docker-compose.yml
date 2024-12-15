@@ -89,8 +89,8 @@ services:
     build:
       context: .
       dockerfile: ./Migration.Dockerfile
-      args:
-        CONNECTION_STRING: "User ID=${DB_USER};Password=${DB_PASSWORD};Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};"
+    environment:
+      ConnectionStrings__PostieDbContext: "User ID=${DB_USER};Password=${DB_PASSWORD};Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};"
     depends_on:
        postgres:
          condition: service_started

@@ -1,9 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-ARG CONNECTION_STRING
-ENV CONNECTION_STRING=$CONNECTION_STRING
-
 RUN dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
 

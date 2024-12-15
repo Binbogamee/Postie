@@ -15,7 +15,16 @@ builder.Configuration.SetBasePath(AppContext.BaseDirectory)
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-    ConnectionMultiplexer.Connect(builder.Configuration.GetSection("Redis:ConnectionString").Value));
+{
+    try
+    {
+        return ConnectionMultiplexer.Connect(builder.Configuration.GetSection("Redis:ConnectionString").Value);
+    }
+    catch
+    {
+        return null;
+    }
+});
 
 ExternalConfigSettings.Initialize(builder.Configuration);
 
