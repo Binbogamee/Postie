@@ -1,0 +1,43 @@
+MIT License
+
+Copyright (c) 2024 Elizaveta Yanina
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+This product includes components licensed under the Apache 2.0 License. The full text of the license can be found at: https://www.apache.org/licenses/LICENSE-2.0.
+
+This project includes components licensed under the BSD-3-Clause License:
+- NLog (https://github.com/NLog/NLog) — BSD-3-Clause License(https://opensource.org/licenses/BSD-3-Clause).
+- NLog.Web.AspNetCore (https://github.com/NLog/NLog.Web) — BSD-3-Clause License (https://opensource.org/licenses/BSD-3-Clause).
+
+This project includes components licensed under the PostgreSQL License:
+- Npgsql.EntityFrameworkCore.PostgreSQL (https://github.com/npgsql/efcore.pg) — PostgreSQL License (https://opensource.org/licenses/PostgreSQL).
+
+This project includes components licensed under the MIT License:
+- BCrypt.Net-Next (https://github.com/BcryptNet/bcrypt.net) — MIT License (https://opensource.org/licenses/MIT).
+- Microsoft.AspNetCore.Authentication.JwtBearer (https://github.com/dotnet/aspnetcore) — MIT License (https://opensource.org/licenses/MIT).
+- Microsoft.EntityFrameworkCore (https://github.com/dotnet/efcore) — MIT License (https://opensource.org/licenses/MIT).
+- Microsoft.EntityFrameworkCore.Design (https://github.com/dotnet/efcore) — MIT License (https://opensource.org/licenses/MIT).
+- Microsoft.NET.Test.Sdk (https://github.com/microsoft/vstest) — MIT License (https://opensource.org/licenses/MIT).
+- MSTest.TestAdapter (https://github.com/microsoft/testfx) — MIT License (https://opensource.org/licenses/MIT).
+- MSTest.TestFramework (https://github.com/microsoft/testfx) — MIT License (https://opensource.org/licenses/MIT).
+- Newtonsoft.Json (https://github.com/JamesNK/Newtonsoft.Json) — MIT License (https://opensource.org/licenses/MIT).
+- Ocelot (https://github.com/ThreeMammals/Ocelot) — MIT License (https://opensource.org/licenses/MIT).
+- StackExchange.Redis (https://github.com/StackExchange/StackExchange.Redis/) — MIT License (https://opensource.org/licenses/MIT).
+- Swashbuckle.AspNetCore (https://github.com/domaindrivendev/Swashbuckle.AspNetCore) — MIT License (https://opensource.org/licenses/MIT).
