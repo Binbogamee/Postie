@@ -7,11 +7,21 @@
 ## Оглавление
 1. [Технологии](#технологии)
 2. [Основные функции](#основные-функции)
-3. [Схема взаимодействия микросервисов](#схема-взаимодействия-микросервисов)
-4. [Как запустить проект](#как-запустить-проект)
-5. [Примеры запросов](#примеры-запросов)
-6. [Тестирование](#тестирование)
-7. [Используемые лицензии](#Используемые-лицензии)
+    - [Сервис управления аккаунтами (accountService)](#сервис-управления-аккаунтами-accountservice)
+    - [Сервис управления постами (postService)](#сервис-управления-постами-postservice)
+    - [Сервис аутентификации (authService)](#сервис-аутентификации-authservice)
+    - [Сервис логирования (loggingService)](#сервис-логирования-loggingservice)
+    - [API Gateway](#api-gateway)
+4. [Схема взаимодействия микросервисов](#схема-взаимодействия-микросервисов)
+5. [Как запустить проект](#как-запустить-проект)
+    - [Зависимости](#зависимости)
+    - [Локальный запуск в Visual Studio](#локальный-запуск-в-visual-studio)
+    - [Запуск в Docker (локальная сборка)](#запуск-в-docker-локальная-сборка)
+    - [Запуск в Docker (изображения из Docker Hub)](#запуск-в-docker-изображения-из-docker-hub)
+7. [Примеры запросов](#примеры-запросов)
+8. [Тестирование](#тестирование)
+9. [Используемые лицензии](#используемые-лицензии)
+10. [Полный перечень запросов к API](#полный-перечень-запросов-к-api)
 
 ## Технологии
 
@@ -83,7 +93,7 @@
 - **Kafka + ZooKeeper:** используются для передачи логов
 - **Redis:** используется для кэширования сессий
 
-### 1. Локальный запуск **в Visual Studio**
+### Локальный запуск **в Visual Studio**
 
 1. Клонируйте репозиторий
     
@@ -99,7 +109,7 @@
     - Проект `ApiGateway` → файл `ocelot.json`: настройки API Gateway.
 3. Соберите и запустите необходимые проекты.
 
-### 2. Запуск в Docker (локальная сборка)
+### Запуск в Docker (локальная сборка)
 
 1. Клонируйте репозиторий
     
@@ -115,7 +125,7 @@
     ```
     
 
-### 3. Запуск в Docker (изображения из Docker Hub)
+### Запуск в Docker (изображения из Docker Hub)
 
 1. Создайте docker compose файл.
 
@@ -377,7 +387,7 @@ POST /api/Login
 **Ответ:**
 
 ```bash
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXF1ZXN0ZXJJZCI6ImRjZWExMTQ4LWQyZDQtNGIyZS1hZjcwLWIwYjJiYmI2MDEzYiIsImV4cCI6MTczNDYzODg4NX0.nE2mfdXIt0sOaEdx4oeBDxARYPLGDpLTRdBaNpKeZuQ # jwt токен
+<your-token>
 ```
 
 **Статус код:** 200 OK
@@ -388,6 +398,8 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXF1ZXN0ZXJJZCI6ImRjZWExMTQ4LWQyZDQtNGI
 
 ```bash
 POST /api/Post
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
 ```
 
 **Тело запроса:**
@@ -412,6 +424,8 @@ POST /api/Post
 
 ```bash
 GET /api/Post
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
 ```
 
 **Ответ:**
@@ -436,6 +450,8 @@ GET /api/Post
 
 ```bash
 PUT /api/Post/c11b474b-f600-4a34-9b4f-da7aa1448873
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
 ```
 
 **Тело запроса:**
@@ -460,6 +476,8 @@ PUT /api/Post/c11b474b-f600-4a34-9b4f-da7aa1448873
 
 ```bash
 DELETE /api/Post/c11b474b-f600-4a34-9b4f-da7aa1448873
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
 ```
 
 **Ответ:**
@@ -527,3 +545,334 @@ true
 - [**Ocelot**](https://github.com/ThreeMammals/Ocelot) — MIT License
 - [**StackExchange.Redis**](https://github.com/StackExchange/StackExchange.Redis/) — MIT License
 - [**Swashbuckle.AspNetCore**](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) — MIT License
+
+## Полный перечень запросов к API
+
+### 1. Регистрация (POST)
+
+**Запрос:**
+
+```bash
+POST /api/Account
+Host: <api-gateway-host>
+```
+
+**Тело запроса:**
+
+```json
+{
+"username": "newuser",
+"email": "newuser@mail.com",
+"password": "password"
+}
+```
+
+**Ответ:**
+
+```bash
+"dcea1148-d2d4-4b2e-af70-b0b2bbb6013b” # Guid нового аккаунта
+```
+
+**Статус код:** 200 OK
+
+### 2. Вход в аккаунт (POST)
+
+**Запрос:**
+
+```bash
+POST /api/Login
+Host: <api-gateway-host>
+```
+
+**Тело запроса:**
+
+```json
+{
+"email": "newuser@mail.com",
+"password": "password"
+}
+```
+
+**Ответ:**
+
+```bash
+<your-token>
+```
+
+**Статус код:** 200 OK
+
+### 3. Выход из аккаунта (POST)
+
+**Запрос:**
+
+```bash
+POST /api/Logout
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Статус код:** 200 OK
+
+### 4. Получить список аккаунтов
+
+**Запрос:**
+
+```bash
+GET /api/Account
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Ответ:**
+
+```json
+[
+    {
+        "id": "dcea1148-d2d4-4b2e-af70-b0b2bbb6013b",
+        "username": "string",
+        "email": "string@string.com"
+    }
+]
+```
+
+**Статус код:** 200 OK
+
+### 5. Редактировать аккаунт (PUT)
+
+**Запрос:**
+
+```bash
+PUT /api/Account/{id}
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Тело запроса:**
+
+```json
+{
+  "username": "newUsername",
+  "email": "user@mail.com"
+}
+```
+
+**Ответ:**
+
+```bash
+"dcea1148-d2d4-4b2e-af70-b0b2bbb6013b” # Guid аккаунта
+```
+
+**Статус код:** 200 OK
+
+### 6. Получить аккаунт по id (GET)
+
+**Запрос:**
+
+```bash
+GET /api/Account/{id}
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Ответ:**
+
+```bash
+{
+    "id": "dcea1148-d2d4-4b2e-af70-b0b2bbb6013b",
+    "username": "username",
+    "email": "user@mail.com"
+}
+```
+
+**Статус код:** 200 OK
+
+### 7. Сменить пароль (PUT)
+
+**Запрос:**
+
+```bash
+PUT /api/Account/{id}/Password
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Тело запроса:**
+
+```json
+{
+  "oldPassword": "string",
+  "newPassword": "string"
+}
+```
+
+**Ответ:**
+
+```bash
+
+```
+
+**Статус код:** 200 OK
+
+### 8. Удалить аккаунт (DELETE)
+
+**Запрос:**
+
+```bash
+DELETE /api/Account/{id}
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Ответ:**
+
+```bash
+true
+```
+
+**Статус код:** 200 OK
+
+### 9. Создать пост (POST)
+
+**Запрос:**
+
+```bash
+POST /api/Post
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Тело запроса:**
+
+```json
+{
+    "text": "текст нового поста"
+}
+```
+
+**Ответ:**
+
+```bash
+"c11b474b-f600-4a34-9b4f-da7aa1448873" # Guid нового поста
+```
+
+**Статус код:** 200 OK
+
+### 10. Получить список всех постов (GET)
+
+**Запрос:**
+
+```bash
+GET /api/Post
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Ответ:**
+
+```json
+[
+    {
+        "id": "c11b474b-f600-4a34-9b4f-da7aa1448873",
+        "accountId": "dcea1148-d2d4-4b2e-af70-b0b2bbb6013b",
+        "text": "текст нового поста",
+        "createdBy": "2024-12-19T08:10:26.303688+00:00",
+        "modifiedBy": null
+    }
+]
+```
+
+**Статус код:** 200 OK
+
+### 11. Получить пост по id (GET)
+
+**Запрос:**
+
+```bash
+GET /api/Post/{id}
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Ответ:**
+
+```json
+{
+    "id": "7f56a7ce-c358-4945-9ffb-95e11fd5296b",
+    "text": "текст нового поста",
+    "createdBy": "2024-12-19T10:48:16.447243Z",
+    "modifiedBy": null,
+    "accountId": "5cd1aec1-88bb-420d-812b-29dec8df50ba"
+}
+```
+
+**Статус код:** 200 OK
+
+### 12. Получить список постов по id аккаунта
+
+**Запрос:**
+
+```bash
+GET /api/Post?accountId={id}
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Ответ:**
+
+```bash
+[
+    {
+        "id": "7f56a7ce-c358-4945-9ffb-95e11fd5296b",
+        "accountId": "5cd1aec1-88bb-420d-812b-29dec8df50ba",
+        "text": "текст нового поста",
+        "createdBy": "2024-12-19T10:48:16.447243+00:00",
+        "modifiedBy": null
+    }
+]
+```
+
+**Статус код:** 200 OK
+
+### 13. Редактировать пост (PUT)
+
+**Запрос:**
+
+```bash
+PUT /api/Post/{id}
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Тело запроса:**
+
+```json
+{
+    "text": "текст обновленного поста"
+}
+```
+
+**Ответ:**
+
+```bash
+"c11b474b-f600-4a34-9b4f-da7aa1448873" # Guid обновленного поста
+```
+
+**Статус код:** 200 OK
+
+### 14. Удалить пост (DELETE)
+
+**Запрос:**
+
+```bash
+DELETE /api/Post/{id}
+Host: <api-gateway-host>
+Authorization: Bearer <your-token>
+```
+
+**Ответ:**
+
+```bash
+true
+```
+
+**Статус код:** 200 OK
