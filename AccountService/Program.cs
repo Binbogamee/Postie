@@ -1,6 +1,7 @@
 using AccountService.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Postie.DAL;
+using Postie.Infrastructure;
 using Postie.Interfaces;
 using Shared.KafkaLogging;
 
@@ -22,6 +23,7 @@ builder.Services.AddDbContext<PostieDbContext>(
 
 ExternalConfigSettings.Initialize(builder.Configuration);
 
+builder.Services.AddAutoMapper(typeof(MapperProfile));
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ILoggingProducerService, LoggingProducerService>();
 builder.Services.AddScoped<IAccountService, AccountService.Services.AccountService>();
@@ -30,6 +32,7 @@ builder.Services.AddHostedService<LifetimeService>();
 
 var app = builder.Build();
 
+app.UseMiddleware<RequesterIdMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI();
 

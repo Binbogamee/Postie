@@ -1,14 +1,15 @@
-﻿using Postie.Models;
+﻿using Postie.Dtos;
+using Postie.Models;
 
 namespace Postie.Interfaces
 {
     public interface IPostService
     {
-        Result<ICollection<Post>> List();
-        Result<ICollection<Post>> ListByAccountId(Guid accountId);
-        Result<Post> Get(Guid id);
-        Result<Guid> Update(Guid id, string text, Guid requesterId);
-        Result<Guid> Create(Guid accountId, string text);
+        Result<ICollection<CreatedPostDto>> List();
+        Result<ICollection<CreatedPostDto>> ListByAccountId(Guid accountId);
+        Result<CreatedPostDto> Get(Guid id);
+        Result<Guid> Update(Guid id, Guid requesterId, RequestPostDto request);
+        Result<Guid> Create(Guid requesterId, RequestPostDto request);
         Result<bool> Delete(Guid id, Guid requesterId);
     }
 }

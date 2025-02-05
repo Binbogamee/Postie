@@ -1,14 +1,15 @@
-﻿using Postie.Models;
+﻿using Postie.Dtos;
+using Postie.Models;
 
 namespace Postie.Interfaces
 {
     public interface IAccountService
     {
-        Result<ICollection<Account>> List();
-        Result<Account> Get(Guid id);
-        Result<Guid> Create(string username, string email, string password);
+        Result<ICollection<AccountDto>> List();
+        Result<AccountDto> Get(Guid id);
+        Result<Guid> Create(NewAccountRequest request);
         Result<bool> Delete(Guid requesterId,Guid id);
-        Result<Guid> Update(Guid requesterId,Guid id, string username, string email);
-        Result<string> ChangePassword(Guid requesterId,Guid id, string oldPassword, string newPassword);
+        Result<Guid> Update(Guid requesterId, AccountDto request);
+        Result<string> ChangePassword(Guid requesterId, Guid id, string oldPassword, string newPassword);
     }
 }

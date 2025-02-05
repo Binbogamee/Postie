@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Postie.DAL;
 using Postie.DAL.Entities;
 using Postie.Interfaces;
@@ -10,10 +10,12 @@ namespace AccountService.Repositories
     public class AccountRepository : IAccountRepository
     {
         private readonly PostieDbContext _context;
+        private readonly IMapper _mapper;
 
-        public AccountRepository(PostieDbContext context)
+        public AccountRepository(PostieDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public void Create(Account account)
@@ -48,22 +50,17 @@ namespace AccountService.Repositories
             
             _context.Accounts.Update(entity);
             _context.SaveChanges();
+            _context.ChangeTracker.Clear();
         }
 
         private Account AccountMapper(AccountEntity entity)
         {
-            return new Account(entity.Username, entity.Email, entity.PasswordHash, entity.Id);
+            return _mapper.Map<Account>(entity);
         }
 
         private AccountEntity AccountMapper(Account account)
         {
-            return new AccountEntity()
-            {
-                Id = account.Id,
-                Username = account.Username,
-                Email = account.Email,
-                PasswordHash = account.PasswordHash
-            };
+            return _mapper.Map<AccountEntity>(account);
         }
     }
 }

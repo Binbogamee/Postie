@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Hosting;
+using Postie.Dtos;
 using Postie.Models;
 
 namespace PostService.Test
@@ -15,18 +15,16 @@ namespace PostService.Test
         [TestMethod]
         public void CreatePostTest()
         {
-            var accountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
-
-            var createResult = PostServiceInstance.Create(accountId, Default_Post);
+            var accountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
+            var createResult = PostServiceInstance.Create(accountId, new RequestPostDto(Default_Post));
             Assert.IsTrue(createResult.IsSuccess);
         }
 
         [TestMethod]
         public void CreateInvalidPostTest()
         {
-            var accountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
-
-            var emptyResult = PostServiceInstance.Create(accountId, "");
+            var accountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
+            var emptyResult = PostServiceInstance.Create(accountId, new RequestPostDto(""));
             Assert.IsFalse(emptyResult.IsSuccess);
             Assert.IsTrue(emptyResult.Error == ErrorType.ValidationError);
         }
@@ -34,9 +32,9 @@ namespace PostService.Test
         [TestMethod]
         public void GetPostByIdTest()
         {
-            var accountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
+            var accountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
 
-            var postId = PostServiceInstance.Create(accountId, Default_Post).Value;
+            var postId = PostServiceInstance.Create(accountId, new RequestPostDto(Default_Post)).Value;
             var post = PostServiceInstance.Get(postId);
             Assert.IsTrue(post.IsSuccess);
             Assert.IsTrue(post.Value.Text == Default_Post);
@@ -47,10 +45,10 @@ namespace PostService.Test
         [TestMethod]
         public void GetPostsListTest()
         {
-            var accountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
+            var accountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
             var secondPost = "second post";
-            PostServiceInstance.Create(accountId, Default_Post);
-            PostServiceInstance.Create(accountId, secondPost);
+            PostServiceInstance.Create(accountId, new RequestPostDto(Default_Post));
+            PostServiceInstance.Create(accountId, new RequestPostDto(secondPost));
 
             var posts = PostServiceInstance.List();
             Assert.IsTrue(posts.IsSuccess);
@@ -62,12 +60,12 @@ namespace PostService.Test
         [TestMethod]
         public void GetPostsByAccountIdTest()
         {
-            var firstAccountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
-            var secondAccountId = AccountServiceInstance.Create("test", "test@test.com", "testTest1").Value;
+            var firstAccountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
+            var secondAccountId = AccountServiceInstance.Create(new NewAccountRequest("test", "test@test.com", "testTest1")).Value;
 
             var secondPost = "second post";
-            PostServiceInstance.Create(firstAccountId, Default_Post);
-            PostServiceInstance.Create(secondAccountId, secondPost);
+            PostServiceInstance.Create(firstAccountId, new RequestPostDto(Default_Post));
+            PostServiceInstance.Create(secondAccountId, new RequestPostDto(secondPost));
 
             var allPosts = PostServiceInstance.List().Value;
             Assert.IsTrue(allPosts.Count == 2);
@@ -81,14 +79,14 @@ namespace PostService.Test
         [TestMethod]
         public void UpdatePostTest()
         {
-            var accountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
+            var accountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
 
-            var postId = PostServiceInstance.Create(accountId, Default_Post).Value;
+            var postId = PostServiceInstance.Create(accountId, new RequestPostDto(Default_Post)).Value;
             var post = PostServiceInstance.Get(postId);
             Assert.IsTrue(post.Value.Text == Default_Post);
 
             var text = "new text";
-            var update = PostServiceInstance.Update(postId, text, accountId);
+            var update = PostServiceInstance.Update(postId, accountId, new RequestPostDto(text));
             Assert.IsTrue(update.IsSuccess);
 
             var updatedPost = PostServiceInstance.Get(postId).Value;
@@ -99,9 +97,9 @@ namespace PostService.Test
         [TestMethod]
         public void DeletePostTest()
         {
-            var accountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
+            var accountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
 
-            var postId = PostServiceInstance.Create(accountId, Default_Post).Value;
+            var postId = PostServiceInstance.Create(accountId, new RequestPostDto(Default_Post)).Value;
             var post = PostServiceInstance.Get(postId);
             Assert.IsTrue(post.Value.Id == postId);
 
@@ -114,12 +112,11 @@ namespace PostService.Test
         [TestMethod]
         public void AuthorizeTest()
         {
-            var firstAccountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
-            var secondAccountId = AccountServiceInstance.Create("test", "test@test.com", "testTest1").Value;
+            var firstAccountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
+            var secondAccountId = AccountServiceInstance.Create(new NewAccountRequest("test", "test@test.com", "testTest1")).Value;
 
-            var secondPost = "second post";
-            var postId = PostServiceInstance.Create(firstAccountId, Default_Post).Value;
-            var update = PostServiceInstance.Update(postId, "second post", secondAccountId);
+            var postId = PostServiceInstance.Create(firstAccountId, new RequestPostDto(Default_Post)).Value;
+            var update = PostServiceInstance.Update(secondAccountId, postId, new RequestPostDto("second post"));
             Assert.IsFalse(update.IsSuccess);
             Assert.IsTrue(update.Error == ErrorType.AccessDenied);
 

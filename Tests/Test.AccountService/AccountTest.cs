@@ -1,4 +1,5 @@
-﻿using Postie.Models;
+﻿using Postie.Dtos;
+using Postie.Models;
 
 namespace AccountService.Test
 {
@@ -12,36 +13,36 @@ namespace AccountService.Test
         [TestMethod]
         public void CreateAccountTest()
         {
-            var newAccount = AccountServiceInstance.Create(User_Name, User_Email, User_Password);
+            var newAccount = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password));
             Assert.IsTrue(newAccount.IsSuccess);
         }
 
         [TestMethod]
         public void CreateInvalidAccountTest()
         {
-            var emptyUsernameAccount = AccountServiceInstance.Create("", "", "");
+            var emptyUsernameAccount = AccountServiceInstance.Create(new NewAccountRequest("", "", ""));
             Assert.IsTrue(emptyUsernameAccount.Error == ErrorType.ValidationError);
 
-            var tooLongUsername = AccountServiceInstance.Create(new string('a', 100), "email", "");
+            var tooLongUsername = AccountServiceInstance.Create(new NewAccountRequest(new string('a', 100), "email", ""));
             Assert.IsTrue(tooLongUsername.Error == ErrorType.ValidationError);
 
-            var tooLongEmail = AccountServiceInstance.Create("name", new string('a', 256), "");
+            var tooLongEmail = AccountServiceInstance.Create(new NewAccountRequest("name", new string('a', 256), ""));
             Assert.IsTrue(tooLongEmail.Error == ErrorType.ValidationError);
 
-            var invalidEmail = AccountServiceInstance.Create("name", "email", "");
+            var invalidEmail = AccountServiceInstance.Create(new NewAccountRequest("name", "email", ""));
             Assert.IsTrue(invalidEmail.Error == ErrorType.ValidationError);
 
-            var shortPassword = AccountServiceInstance.Create("name", "email@email.com", "1234");
+            var shortPassword = AccountServiceInstance.Create(new NewAccountRequest("name", "email@email.com", "1234"));
             Assert.IsTrue(shortPassword.Error == ErrorType.ValidationError);
 
-            var invalidPassword = AccountServiceInstance.Create("name", "email@email.com", "123456789");
+            var invalidPassword = AccountServiceInstance.Create(new NewAccountRequest("name", "email@email.com", "123456789"));
             Assert.IsTrue(invalidPassword.Error == ErrorType.ValidationError);
         }
 
         [TestMethod]
         public void GetAccountByIdTest()
         {
-            var createResult = AccountServiceInstance.Create(User_Name, User_Email, User_Password);
+            var createResult = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password));
             var createdAccount = AccountServiceInstance.Get(createResult.Value);
 
             Assert.IsTrue(createdAccount.IsSuccess);
@@ -52,8 +53,8 @@ namespace AccountService.Test
         [TestMethod]
         public void GetAccountsListTest()
         {
-            AccountServiceInstance.Create(User_Name, User_Email, User_Password);
-            AccountServiceInstance.Create("test", "test@test.com", "testTest1");
+            AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password));
+            AccountServiceInstance.Create(new NewAccountRequest("test", "test@test.com", "testTest1"));
 
             var list = AccountServiceInstance.List();
             Assert.IsTrue(list.Value.Count == 2);
@@ -62,13 +63,13 @@ namespace AccountService.Test
         [TestMethod]
         public void UpdateAccountTest()
         {
-            var createResult = AccountServiceInstance.Create(User_Name, User_Email, User_Password);
+            var createResult = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password));
             var accountId = createResult.Value;
             var createdAccount = AccountServiceInstance.Get(accountId);
             Assert.IsTrue(createdAccount.Value.Email == User_Email);
 
             var newEmail = "newemail@email.com";
-            var updateResult = AccountServiceInstance.Update(accountId, accountId, User_Name, newEmail);
+            var updateResult = AccountServiceInstance.Update(accountId, new AccountDto(accountId, User_Name, newEmail));
             Assert.IsTrue(updateResult.IsSuccess);
 
             var updatedAccount = AccountServiceInstance.Get(accountId);
@@ -78,7 +79,7 @@ namespace AccountService.Test
         [TestMethod]
         public void DeleteAccountTest()
         {
-            var createResult = AccountServiceInstance.Create(User_Name, User_Email, User_Password);
+            var createResult = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password));
             var accountId = createResult.Value;
             var createdAccount = AccountServiceInstance.Get(accountId);
             Assert.IsTrue(createdAccount.IsSuccess);
@@ -92,10 +93,8 @@ namespace AccountService.Test
         [TestMethod]
         public void ChangePasswordTest()
         {
-            var createResult = AccountServiceInstance.Create(User_Name, User_Email, User_Password);
+            var createResult = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password));
             var accountId = createResult.Value;
-            var createdAccount = AccountServiceInstance.Get(accountId);
-            var oldPasswordHash = createdAccount.Value.PasswordHash;
 
             var failedChanging = AccountServiceInstance.ChangePassword(accountId, accountId, "123456789", "newPassword1");
             Assert.IsFalse(failedChanging.IsSuccess);
@@ -105,17 +104,22 @@ namespace AccountService.Test
             Assert.IsTrue(successChanging.IsSuccess);
             Assert.IsTrue(String.IsNullOrEmpty(successChanging.Value));
 
-            var newAccount = AccountServiceInstance.Get(accountId);
-            Assert.IsFalse(oldPasswordHash ==  newAccount.Value.PasswordHash);
+            var failedChanging2 = AccountServiceInstance.ChangePassword(accountId, accountId, User_Password, "newPassword2");
+            Assert.IsFalse(failedChanging2.IsSuccess);
+            Assert.IsTrue(failedChanging2.Error == ErrorType.ValidationError);
+
+            var successChanging2 = AccountServiceInstance.ChangePassword(accountId, accountId, "newPassword1", "newPassword2");
+            Assert.IsTrue(successChanging2.IsSuccess);
+            Assert.IsTrue(String.IsNullOrEmpty(successChanging.Value));
         }
 
         [TestMethod]
         public void AuthorizeTest()
         {
-            var firstAccountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
-            var secondAccountId = AccountServiceInstance.Create("test", "test@test.com", "testTest1").Value;
+            var firstAccountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
+            var secondAccountId = AccountServiceInstance.Create(new NewAccountRequest("test", "test@test.com", "testTest1")).Value;
 
-            var update = AccountServiceInstance.Update(secondAccountId, firstAccountId, "newusername", "newemail@email.com");
+            var update = AccountServiceInstance.Update(secondAccountId, new AccountDto(firstAccountId, "newusername", "newemail@email.com"));
             Assert.IsFalse(update.IsSuccess);
             Assert.IsTrue(update.Error == ErrorType.AccessDenied);
 

@@ -2,10 +2,12 @@ using AccountService.Repositories;
 using AuthHelper;
 using AuthService.Jwt;
 using AuthService.Repositories;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Postie.DAL;
+using Postie.Infrastructure;
 using Postie.Interfaces;
 using PostService.Repositories;
 
@@ -19,6 +21,7 @@ namespace BaseTest
         public readonly IAccountService AccountServiceInstance;
         public readonly IAuthService AuthServiceInstance;
         public readonly IPostService PostServiceInstance;
+        public readonly IMapper Mapper;
 
         public const string User_Password = "IvanIvan1";
         public const string User_Name = "Ivan";
@@ -48,11 +51,12 @@ namespace BaseTest
                     options.UseNpgsql(connectionString);
                 });
 
+            services.AddAutoMapper(typeof(MapperProfile));
             services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IAccountService, AccountService.Services.AccountService>();
 
             services.AddTransient<IPostRepository, PostRepository>();
-            services.AddTransient<IPostService, PostService.InternalServices.PostService>();
+            services.AddTransient<IPostService, PostService.Services.PostService>();
 
 
             services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));

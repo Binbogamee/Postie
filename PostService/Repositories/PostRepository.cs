@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Postie.DAL;
 using Postie.DAL.Entities;
 using Postie.Interfaces;
@@ -9,9 +10,11 @@ namespace PostService.Repositories
     public class PostRepository : IPostRepository
     {
         private readonly PostieDbContext _context;
-        public PostRepository(PostieDbContext context)
+        private readonly IMapper _mapper;
+        public PostRepository(PostieDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public void Create(Post post)
@@ -61,19 +64,12 @@ namespace PostService.Repositories
 
         private Post PostMapper(PostEntity entity)
         {
-            return new Post(entity.Text, entity.AccountId, entity.Id, entity.CreatedBy, entity.ModifiedBy);
+            return _mapper.Map<Post>(entity);
         }
 
         private PostEntity PostMapper(Post post)
         {
-            return new PostEntity()
-            {
-                Id = post.Id,
-                AccountId = post.AccountId,
-                Text = post.Text,
-                CreatedBy = post.CreatedBy,
-                ModifiedBy = post.ModifiedBy
-            };
+            return _mapper.Map<PostEntity>(post);
         }
     }
 }

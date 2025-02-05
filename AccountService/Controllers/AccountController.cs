@@ -19,7 +19,7 @@ namespace AccountService.Controllers
         [HttpPost]
         public ActionResult<Guid> Create([FromBody] NewAccountRequest request)
         {
-            var result = _accountService.Create(request.Username, request.Email, request.Password);
+            var result = _accountService.Create(request);
 
             if (result.IsSuccess)
             {
@@ -30,9 +30,11 @@ namespace AccountService.Controllers
         }
 
         [HttpDelete("{id:guid}")]
-        public ActionResult<bool> Delete(Guid id, [FromBody] RequesterDto request)
+        public ActionResult<bool> Delete(Guid id)
         {
-            var result = _accountService.Delete(request.RequesterId, id);
+            var requesterId = Guid.Empty;
+            Guid.TryParse((string)HttpContext.Items[RequesterIdMiddleware.UserIdName], out requesterId);
+            var result = _accountService.Delete(requesterId, id);
 
             if (result.IsSuccess)
             {
@@ -43,35 +45,37 @@ namespace AccountService.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public ActionResult<AccountResponse> Get(Guid id)
+        public ActionResult<AccountDto> Get(Guid id)
         {
             var result = _accountService.Get(id);
 
             if (result.IsSuccess)
             {
-                var account = result.Value;
-                return Ok(new AccountResponse(account.Id, account.Username, account.Email));
+                return Ok(result.Value);
             }
 
             return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpGet]
-        public ActionResult<List<AccountResponse>> List()
+        public ActionResult<List<AccountDto>> List()
         {
             var result = _accountService.List();
             if (result.IsSuccess)
             {
-                return Ok(result.Value.Select(x => new AccountResponse(x.Id, x.Username, x.Email)).ToList());
+                return Ok(result.Value);
             }
 
             return ControllerResultMapper.ResultMapper(result.Error, result.ErrorMessage);
         }
 
         [HttpPut("{id:guid}")]
-        public ActionResult<Guid> Update(Guid id, [FromBody] AccountRequest request)
+        public ActionResult<Guid> Update(Guid id, [FromBody] AccountDto request)
         {
-            var result = _accountService.Update(request.RequesterId, id, request.Username, request.Email);
+            request = new AccountDto(id, request.Username, request.Email);
+            var requesterId = Guid.Empty;
+            Guid.TryParse((string)HttpContext.Items[RequesterIdMiddleware.UserIdName], out requesterId);
+            var result = _accountService.Update(requesterId, request);
 
             if (result.IsSuccess)
             {
@@ -84,7 +88,9 @@ namespace AccountService.Controllers
         [HttpPut("{id:guid}/Password")]
         public ActionResult<bool> ChangePassword(Guid id, [FromBody] PasswordChangeRequest request)
         {
-            var result = _accountService.ChangePassword(request.RequesterId, id, request.OldPassword, request.NewPassword);
+            var requesterId = Guid.Empty;
+            Guid.TryParse((string)HttpContext.Items[RequesterIdMiddleware.UserIdName], out requesterId);
+            var result = _accountService.ChangePassword(requesterId, id, request.OldPassword, request.NewPassword);
 
             if (result.IsSuccess)
             {

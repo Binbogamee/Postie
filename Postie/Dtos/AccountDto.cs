@@ -7,23 +7,15 @@
         string Password
     );
 
-    public record AccountResponse
+    public record AccountDto
     (
         Guid Id,
         string Username,
         string Email
     );
 
-    public record AccountRequest
-    (
-        Guid RequesterId,
-        string Username,
-        string Email
-    );
-
     public record PasswordChangeRequest
     (
-        Guid RequesterId,
         string OldPassword,
         string NewPassword
     );

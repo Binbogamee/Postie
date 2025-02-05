@@ -1,4 +1,6 @@
-﻿using Postie.Infrastructure;
+﻿using AutoMapper;
+using Postie.Dtos;
+using Postie.Infrastructure;
 using Postie.Interfaces;
 using Postie.Models;
 using System.Text;
@@ -14,17 +16,19 @@ namespace AccountService.Services
 
         private readonly IAccountRepository _accountRepository;
         private readonly PasswordHashHelper _accountManager;
+        private readonly IMapper _mapper;
 
-        public AccountService(IAccountRepository accountRepository)
+        public AccountService(IAccountRepository accountRepository, IMapper mapper)
         {
             _accountRepository = accountRepository;
             _accountManager = PasswordHashHelper.Instance;
+            _mapper = mapper;
         }
-        public Result<Guid> Create(string username, string email, string password)
+        public Result<Guid> Create(NewAccountRequest request)
         {
-            username = username.Trim();
-            email = email.Trim();
-            password = password.Trim();
+            var username = request.Username.Trim();
+            var email = request.Email.Trim();
+            var password = request.Password.Trim();
 
             var validated = ValidateUserData(username, email);
             var passwordCheck = ValidatePassword(password);
@@ -54,37 +58,38 @@ namespace AccountService.Services
             return Result<bool>.Success(_accountRepository.Delete(id));
         }
 
-        public Result<Account> Get(Guid id)
+        public Result<AccountDto> Get(Guid id)
         {
-            return Result<Account>.Success(_accountRepository.Get(id));
+            var account = _accountRepository.Get(id);
+            return Result<AccountDto>.Success(_mapper.Map<AccountDto>(account));
         }
 
-        public Result<ICollection<Account>> List()
+        public Result<ICollection<AccountDto>> List()
         {
-            return Result<ICollection<Account>>.Success(_accountRepository.List());
+            var accounts = _accountRepository.List();
+            return Result<ICollection<AccountDto>>.Success(_mapper.Map<List<AccountDto>>(accounts));
         }
 
-        public Result<Guid> Update(Guid requesterId, Guid id, string username, string email)
+        public Result<Guid> Update(Guid requesterId, AccountDto dto)
         {
-            if (!IsAuthorized(requesterId, id))
+            var accountFromDto = _mapper.Map<AccountDto>(dto);
+            if (!IsAuthorized(requesterId, accountFromDto.Id))
             {
                 return Result<Guid>.Failure(ErrorType.AccessDenied);
             }
 
-            username = username.Trim();
-            email = email.Trim();
-            var validated = ValidateUserData(username, email, false);
+            var validated = ValidateUserData(accountFromDto.Username, accountFromDto.Email, false);
             if (validated != string.Empty)
             {
                 return Result<Guid>.Failure(ErrorType.ValidationError, validated);
             }
 
-            var oldAccount = _accountRepository.Get(id);
+            var oldAccount = _accountRepository.Get(accountFromDto.Id);
             if (oldAccount.Id == Guid.Empty)
             {
                 return Result<Guid>.Failure(ErrorType.NotFound);
             }
-            var account = new Account(username, email, oldAccount.PasswordHash, id);
+            var account = new Account(accountFromDto.Username, accountFromDto.Email, oldAccount.PasswordHash, accountFromDto.Id);
             _accountRepository.Update(account);
             return Result<Guid>.Success(account.Id);
         }

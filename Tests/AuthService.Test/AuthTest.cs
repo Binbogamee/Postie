@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Postie.Dtos;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace AuthService.Test
@@ -14,7 +15,7 @@ namespace AuthService.Test
         [TestMethod]
         public void LoginTest()
         {
-            var accountId = AccountServiceInstance.Create(User_Name, User_Email, User_Password).Value;
+            var accountId = AccountServiceInstance.Create(new NewAccountRequest(User_Name, User_Email, User_Password)).Value;
             var token = AuthServiceInstance.Login(User_Email, User_Password);
             Assert.IsFalse(String.IsNullOrEmpty(token));
 
