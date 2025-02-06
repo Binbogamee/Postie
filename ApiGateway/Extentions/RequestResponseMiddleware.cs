@@ -23,7 +23,7 @@ namespace ApiGateway.Extentions
 
             context.Request.EnableBuffering();
 
-            await ModifyRequest(context.Request);
+            await CompleteHeader(context.Request);
 
             var builder = new StringBuilder();
             builder.Append(await FormatRequest(context.Request));
@@ -59,19 +59,12 @@ namespace ApiGateway.Extentions
             context.Response.Body = originalBodyStream;
         }
 
-        private async Task ModifyRequest(HttpRequest request)
+        private async Task CompleteHeader(HttpRequest request)
         {
 
             var authstring = _jwtTokenManager.GetRequestToken(request.Headers.Authorization);
 
             if (String.IsNullOrEmpty(authstring))
-            {
-                return;
-            }
-
-            if (request.Method != HttpMethods.Put &&
-                request.Method != HttpMethods.Delete &&
-                !(request.Path == "/api/Post" && request.Method == HttpMethods.Post))
             {
                 return;
             }
@@ -82,26 +75,7 @@ namespace ApiGateway.Extentions
                 return;
             }
 
-            request.Body.Seek(0, SeekOrigin.Begin);
-            var body = await new StreamReader(request.Body).ReadToEndAsync();
-            request.Body.Seek(0, SeekOrigin.Begin);
-
-            try
-            {
-                var json = JsonConvert.DeserializeObject<Dictionary<string, object>>(body);
-                if (json == null)
-                {
-                    json = new Dictionary<string, object>();
-                    request.ContentType = "application/json";
-                }
-                json.Add(requesterId.Type, requesterId.Value);
-
-                var modifiedBody = JsonConvert.SerializeObject(json, Formatting.Indented);
-                var bytes = Encoding.UTF8.GetBytes(modifiedBody);
-                request.Body = new MemoryStream(bytes);
-                request.ContentLength = bytes.Length;
-            }
-            catch { }
+            request.Headers[Shared.CustomHeaders.UserId] = requesterId.Value;
         }
 
         private async Task<string> FormatRequest(HttpRequest request)

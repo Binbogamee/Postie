@@ -32,10 +32,14 @@ namespace AccountService.Controllers
         [HttpDelete("{id:guid}")]
         public ActionResult<bool> Delete(Guid id)
         {
+            var headerid = HttpContext.Items[RequesterIdMiddleware.UserIdName];
             var requesterId = Guid.Empty;
-            Guid.TryParse((string)HttpContext.Items[RequesterIdMiddleware.UserIdName], out requesterId);
-            var result = _accountService.Delete(requesterId, id);
+            if (headerid is Guid guid)
+            {
+                requesterId = guid;
+            }
 
+            var result = _accountService.Delete(requesterId, id);
             if (result.IsSuccess)
             {
                 return Ok(result.Value);
@@ -73,8 +77,13 @@ namespace AccountService.Controllers
         public ActionResult<Guid> Update(Guid id, [FromBody] AccountDto request)
         {
             request = new AccountDto(id, request.Username, request.Email);
+            var headerid = HttpContext.Items[RequesterIdMiddleware.UserIdName];
             var requesterId = Guid.Empty;
-            Guid.TryParse((string)HttpContext.Items[RequesterIdMiddleware.UserIdName], out requesterId);
+            if (headerid is Guid guid)
+            {
+                requesterId = guid;
+            }
+
             var result = _accountService.Update(requesterId, request);
 
             if (result.IsSuccess)
@@ -88,10 +97,14 @@ namespace AccountService.Controllers
         [HttpPut("{id:guid}/Password")]
         public ActionResult<bool> ChangePassword(Guid id, [FromBody] PasswordChangeRequest request)
         {
+            var headerid = HttpContext.Items[RequesterIdMiddleware.UserIdName];
             var requesterId = Guid.Empty;
-            Guid.TryParse((string)HttpContext.Items[RequesterIdMiddleware.UserIdName], out requesterId);
-            var result = _accountService.ChangePassword(requesterId, id, request.OldPassword, request.NewPassword);
+            if (headerid is Guid guid)
+            {
+                requesterId = guid;
+            }
 
+            var result = _accountService.ChangePassword(requesterId, id, request.OldPassword, request.NewPassword);
             if (result.IsSuccess)
             {
                 return Ok(result.Value);

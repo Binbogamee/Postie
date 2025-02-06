@@ -45,8 +45,13 @@ namespace PostService.Controllers
         [HttpPost]
         public ActionResult<Guid> CreatePost([FromBody] RequestPostDto post)
         {
+            var headerid = HttpContext.Items[RequesterIdMiddleware.UserIdName];
             var requesterId = Guid.Empty;
-            Guid.TryParse((string)HttpContext.Items[RequesterIdMiddleware.UserIdName], out requesterId);
+            if (headerid is Guid guid)
+            {
+                requesterId = guid;
+            }
+
             var result = _postService.Create(requesterId, post);
             if (result.IsSuccess)
             {
@@ -59,8 +64,13 @@ namespace PostService.Controllers
         [HttpPut("{id:guid}")]
         public ActionResult<Guid> UpdatePost(Guid id, [FromBody] RequestPostDto post)
         {
+            var headerid = HttpContext.Items[RequesterIdMiddleware.UserIdName];
             var requesterId = Guid.Empty;
-            Guid.TryParse((string)HttpContext.Items[RequesterIdMiddleware.UserIdName], out requesterId);
+            if (headerid is Guid guid)
+            {
+                requesterId = guid;
+            }
+
             var result = _postService.Update(id, requesterId, post);
             if (result.IsSuccess)
             {
@@ -73,8 +83,13 @@ namespace PostService.Controllers
         [HttpDelete("{id:guid}")]
         public ActionResult<bool> DeletePost(Guid id)
         {
+            var headerid = HttpContext.Items[RequesterIdMiddleware.UserIdName];
             var requesterId = Guid.Empty;
-            Guid.TryParse((string)HttpContext.Items[RequesterIdMiddleware.UserIdName], out requesterId);
+            if (headerid is Guid guid)
+            {
+                requesterId = guid;
+            }
+
             var result = _postService.Delete(id, requesterId);
             if (result.IsSuccess)
             {

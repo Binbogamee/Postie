@@ -3,6 +3,7 @@ using AuthService.Jwt;
 using AuthService.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Postie.DAL;
+using Postie.Infrastructure;
 using Postie.Interfaces;
 using Shared.KafkaLogging;
 
@@ -27,6 +28,7 @@ builder.Services.AddDbContext<PostieDbContext>(
 
 ExternalConfigSettings.Initialize(builder.Configuration);
 
+builder.Services.AddAutoMapper(typeof(MapperProfile));
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<ILoggingProducerService, LoggingProducerService>();

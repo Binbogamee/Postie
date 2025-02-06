@@ -13,7 +13,7 @@
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.Request.Headers.TryGetValue("X-User-Id", out var userId))
+            if (context.Request.Headers.TryGetValue(Shared.CustomHeaders.UserId, out var userId))
             {
                 if (Guid.TryParse(userId, out var guid))
                 {
