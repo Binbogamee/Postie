@@ -34,6 +34,11 @@
             <stringProp name="Argument.value">userUser1</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="USR_PASSWORD_NEW" elementType="Argument">
+            <stringProp name="Argument.name">USR_PASSWORD_NEW</stringProp>
+            <stringProp name="Argument.value">userUser2</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
           <elementProp name="USR_NAME_2" elementType="Argument">
             <stringProp name="Argument.name">USR_NAME_2</stringProp>
             <stringProp name="Argument.value">user2</stringProp>
@@ -46,8 +51,6 @@
           </elementProp>
         </collectionProp>
       </elementProp>
-      <boolProp name="TestPlan.functional_mode">false</boolProp>
-      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
@@ -76,7 +79,7 @@
         <hashTree/>
         <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="User story 1"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create account" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create account">
             <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
@@ -125,7 +128,7 @@ if (!m) {
             </JSR223Assertion>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Edit account username without auth" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Edit account username without auth">
             <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
@@ -209,7 +212,7 @@ log.info(&quot;First: &quot; + response1)</stringProp>
             </JSR223Assertion>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Edit account username using auth" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Edit account username using auth">
             <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
@@ -241,7 +244,7 @@ log.info(&quot;First: &quot; + response1)</stringProp>
               </collectionProp>
             </HeaderManager>
             <hashTree/>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Check response is the same account Guid" enabled="true">
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Check response is the same account Guid">
               <stringProp name="scriptLanguage">groovy</stringProp>
               <stringProp name="parameters"></stringProp>
               <stringProp name="filename"></stringProp>
@@ -252,7 +255,7 @@ log.info(&quot;First: &quot; + response1)</stringProp>
             </JSR223Assertion>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get account list" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get account list">
             <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
@@ -266,7 +269,41 @@ log.info(&quot;First: &quot; + response1)</stringProp>
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Authorization</stringProp>
+                  <stringProp name="Header.value">Bearer ${authToken}</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor">
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="script">if (!prev.getResponseDataAsString().contains(vars.get(&quot;accountId&quot;))) {
+    prev.setSuccessful(false)
+}</stringProp>
+              <stringProp name="scriptLanguage">groovy</stringProp>
+            </JSR223PostProcessor>
+            <hashTree/>
+          </hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get account by id">
+            <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
+            <stringProp name="HTTPSampler.path">/api/Account/${accountId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
                   <stringProp name="Header.name">Authorization</stringProp>
@@ -284,6 +321,39 @@ log.info(&quot;First: &quot; + response1)</stringProp>
 }</stringProp>
               <stringProp name="scriptLanguage">groovy</stringProp>
             </JSR223PostProcessor>
+            <hashTree/>
+          </hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Change password">
+            <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
+            <stringProp name="HTTPSampler.path">/api/Account/${accountId}/Password</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">PUT</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;oldPassword&quot;: &quot;${USR_PASSWORD}&quot;,&#xd;
+  &quot;newPassword&quot;: &quot;${USR_PASSWORD_NEW}&quot;&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Authorization</stringProp>
+                  <stringProp name="Header.value">Bearer ${authToken}</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
             <hashTree/>
           </hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Logout" enabled="true">
@@ -381,7 +451,7 @@ vars.remove(&quot;authToken&quot;)</stringProp>
             </JSR223PostProcessor>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Login" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Login">
             <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
@@ -396,7 +466,7 @@ vars.remove(&quot;authToken&quot;)</stringProp>
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.value">{&#xd;
   &quot;email&quot;: &quot;${USR_EMAIL_1}&quot;,&#xd;
-  &quot;password&quot;: &quot;${USR_PASSWORD}&quot;&#xd;
+  &quot;password&quot;: &quot;${USR_PASSWORD_NEW}&quot;&#xd;
 }</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
@@ -404,7 +474,7 @@ vars.remove(&quot;authToken&quot;)</stringProp>
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Getting jwt token" enabled="true">
+            <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Getting jwt token">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">newAuthToken</stringProp>
               <stringProp name="RegexExtractor.regex">&quot;(.+)&quot;</stringProp>
@@ -444,7 +514,7 @@ log.info(&quot;Second: &quot; + response)
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create post using token" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create post using token">
             <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
@@ -500,7 +570,7 @@ if (!m) {
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get post without auth" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get post without auth">
             <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
@@ -526,7 +596,7 @@ if (!m) {
             </JSR223PostProcessor>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get post with auth" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get post with auth">
             <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
@@ -560,6 +630,107 @@ if (!m) {
             </JSR223PostProcessor>
             <hashTree/>
           </hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Edit post">
+            <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
+            <stringProp name="HTTPSampler.path">/api/Post/${postId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">PUT</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+	&quot;text&quot;: &quot;new text&quot;&#xd;
+}&#xd;
+</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Authorization</stringProp>
+                  <stringProp name="Header.value">Bearer ${newAuthToken}</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="Check response is the same post Guid">
+              <stringProp name="scriptLanguage">groovy</stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="script">if (prev.getResponseDataAsString() != &apos;\&quot;&apos; + vars.get(&quot;postId&quot;) + &apos;\&quot;&apos;) {
+    prev.setSuccessful(false)
+}</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+          </hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get posts list">
+            <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
+            <stringProp name="HTTPSampler.path">/api/Post</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Authorization</stringProp>
+                  <stringProp name="Header.value">Bearer ${newAuthToken}</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor">
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="script">if (!prev.getResponseDataAsString().contains(vars.get(&quot;postId&quot;))) {
+    prev.setSuccessful(false)
+}</stringProp>
+              <stringProp name="scriptLanguage">groovy</stringProp>
+            </JSR223PostProcessor>
+            <hashTree/>
+          </hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete post">
+            <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${SRV_PROTOCOL}</stringProp>
+            <stringProp name="HTTPSampler.path">/api/Post/${postId}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Authorization</stringProp>
+                  <stringProp name="Header.value">Bearer ${newAuthToken}</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+          </hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete account">
             <stringProp name="HTTPSampler.domain">${SRV_HOST}</stringProp>
             <stringProp name="HTTPSampler.port">${SRV_PORT}</stringProp>
@@ -574,7 +745,7 @@ if (!m) {
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
                   <stringProp name="Header.name">Authorization</stringProp>
